@@ -1,3 +1,0 @@
-/home/dmac/Documents/projects2025/opengl-template-ibo/CMakeFiles/main.dir
-/home/dmac/Documents/projects2025/opengl-template-ibo/CMakeFiles/edit_cache.dir
-/home/dmac/Documents/projects2025/opengl-template-ibo/CMakeFiles/rebuild_cache.dir
