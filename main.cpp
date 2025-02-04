@@ -7,6 +7,7 @@
 #include <iostream>
 #include <random>
 
+#include "Wireframe.h"
 #include "calculateRays.h"
 #include "ModelLoader.h"
 #include "Mesh.h"
@@ -110,10 +111,9 @@ int main(void)
     double timeDiff;
     unsigned int counter = 0;
 
-    bool wireframeMode = false;
-    bool keyPressedLastFrame = false;
-
-    // glfwSwapInterval(0);
+    glfwSwapInterval(1);
+    
+    WireframeToggler wireframetoggler(window);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -130,6 +130,8 @@ int main(void)
         }
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        wireframetoggler.toggleWireframe();
 
 		timeValue = glfwGetTime();
 		lightPos = 10.0f * glm::vec3(sin(timeValue), 0.5f * sin(8.0f * timeValue), cos(timeValue));
@@ -160,25 +162,7 @@ int main(void)
 			// camera.drawFrustum(rayShader, camera2.projection, camera2.view);
         // }
         // else {
-        // Inside your rendering loop
-        if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) {
-            if (!keyPressedLastFrame) {  // Check if the key was not pressed last frame
-                // Toggle the wireframe mode when the key is first pressed
-                if (!wireframeMode) {
-                    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // Enable wireframe mode
-                    wireframeMode = true;
-                } else {
-                    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  // Revert to solid mode
-                    wireframeMode = false;
-                }
-
-                // Mark that the key has been pressed in this frame
-                keyPressedLastFrame = true;
-            }
-        } else {
-            // If the key is released, mark that it's not pressed anymore
-            keyPressedLastFrame = false;
-        }
+        
         scene.Render(camera, lightPos, lightColor, scale);
 			// camera2.drawFrustum(rayShader, camera.projection, camera.view);
         // }
