@@ -2,8 +2,6 @@
 
 Scene::Scene(Camera* camera) : sceneCam(camera) {}
 
-Scene::~Scene() {}
-
 void Scene::addObject(Mesh& mesh, Shader& shader, glm::mat4 modelMatrix) {
     std::vector<glm::mat4> model;
     model.emplace_back(modelMatrix);

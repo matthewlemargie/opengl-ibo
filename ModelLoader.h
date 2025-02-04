@@ -12,12 +12,11 @@
 #include <string>
 #include "VBO.h"
 
-class Model
+struct Model
 {
-private:
     std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
-public:
+
     Model() = default;
 
     bool load(const std::string& filename);

@@ -15,9 +15,8 @@ struct Vertex
 	//glm::vec2 texUV;
 };
 
-class VBO
+struct VBO
 {
-public:
 	GLuint ID;
 	VBO();
 

@@ -7,9 +7,8 @@
 #include "VBO.h"
 #include "IBO.h"
 
-class VAO
+struct VAO
 {
-public:
 	GLuint ID;
 	int numInstances = 0;
 	VAO();

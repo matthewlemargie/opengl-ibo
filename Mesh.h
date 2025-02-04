@@ -13,9 +13,8 @@
 #include "Camera.h"
 
 
-class Mesh
+struct Mesh
 {
-public:
     glm::mat4 model = glm::mat4(1.0f);
 	glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
 	glm::vec3 Orientation = glm::vec3(0.0f, 0.0f, 1.0f);

@@ -4,9 +4,8 @@
 #include <GL/glew.h>
 #include <vector>
 
-class EBO
+struct EBO
 {
-public:
 	GLuint ID;
 	EBO(std::vector<GLuint>& indices);
 	void Bind();

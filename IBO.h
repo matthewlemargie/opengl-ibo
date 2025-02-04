@@ -10,9 +10,8 @@
 
 #include "VBO.h"
 
-class IBO
+struct IBO
 {
-public:
 	GLuint ID;
 	int numInstances = 0;
 	int maxInstances = 1000;

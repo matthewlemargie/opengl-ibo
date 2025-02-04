@@ -14,9 +14,8 @@
 #include "VAO.h"
 #include "VBO.h"
 
-class Camera
+struct Camera
 {
-public:
 	glm::vec3 Position;
 	glm::vec3 initialPosition;
 	glm::vec3 Orientation = glm::vec3(-1.0f, 0.0f, 0.0f);

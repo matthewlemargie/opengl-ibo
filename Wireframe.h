@@ -3,14 +3,11 @@
 
 #include <GLFW/glfw3.h>
 
-class WireframeToggler {
-public:
+struct WireframeToggler {
     WireframeToggler(GLFWwindow* window);
 
-    void toggleWireframe();
+    void toggleWireframe(GLFWwindow* window);
 
-private:
-    GLFWwindow* window;
     bool wireframeMode;
     bool keyPressedLastFrame;
 };

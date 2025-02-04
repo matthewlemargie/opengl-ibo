@@ -10,13 +10,11 @@
 #include <map>
 #include <set>
 
-class Scene {
-public:
+struct Scene {
     std::map<Shader*, std::set<Mesh*>> shaderMap;
     Camera* sceneCam;
 
     Scene(Camera* camera);
-    ~Scene();
 
     void addObject(Mesh& mesh, Shader& shader, glm::mat4 modelMatrix);
     void Render(Camera& camera, glm::vec3 lightPos, glm::vec4 lightColor, float scale);

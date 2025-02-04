@@ -5,9 +5,8 @@
 
 #include "shaderClass.h"
 
-class Texture
+struct Texture
 {
-public:
 	GLuint ID;
 	const char* type;
 	Texture(const char* image, const char* texType, GLenum slot, GLenum format, GLenum pixelType);
@@ -19,4 +18,4 @@ public:
 
 };
 
-#endif // !TEXTURE_CLASS_H
+#endif
