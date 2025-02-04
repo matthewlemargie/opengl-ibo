@@ -114,6 +114,8 @@ int main(void)
     glfwSwapInterval(1);
     
     WireframeToggler wireframetoggler(window);
+    
+    Ray ray;
 
     while (!glfwWindowShouldClose(window))
     {
@@ -137,7 +139,6 @@ int main(void)
 		lightPos = 10.0f * glm::vec3(sin(timeValue), 0.5f * sin(8.0f * timeValue), cos(timeValue));
         scale = 5.0f + abs(1.0f * cos(2.0f * timeValue));
 
-        // if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) {
         std::vector<glm::mat4> transforms = {};
         if (box.ibo.numInstances < box.ibo.maxInstances)
         {
@@ -147,25 +148,13 @@ int main(void)
             }
         }
         box.addInstance(transforms);
-        // }
 
-        // if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
-			// camera2.Inputs(window);
-        // else
-			camera.Inputs(window);
-       //  
+        camera.Inputs(window);
         camera.updateMatrix();
-        // camera2.updateMatrix();
 
-        // if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) {
-            // scene.Render(camera2, lightPos, lightColor, scale);
-			// camera.drawFrustum(rayShader, camera2.projection, camera2.view);
-        // }
-        // else {
+        ray.drawRay(window, &camera, mode, &rayShader);
         
         scene.Render(camera, lightPos, lightColor, scale);
-			// camera2.drawFrustum(rayShader, camera.projection, camera.view);
-        // }
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -176,11 +165,6 @@ int main(void)
     glfwTerminate();
     return 0;
 }
-
-
-//glfwGetCursorPos(window, &mouseX, &mouseY);
-//camera2.Position = 100.0f * glm::vec3(sin(timeValue), 1.0f, cos(timeValue));
-//camera2.Orientation = -camera2.Position;
 
 //Mesh lightCube("C:/Users/matth/Downloads/box.obj");
 //Shader lightShader("light.vert", "light.frag");
