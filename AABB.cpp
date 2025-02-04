@@ -22,24 +22,6 @@ bool AABB::contains(const glm::vec3& point) const {
            (point.y >= min.y && point.y <= max.y) &&
            (point.z >= min.z && point.z <= max.z);
 }
-glm::vec3 AABB::getCorner(int index) const {
-    static const std::array<glm::vec3, 8> offsets = {
-        glm::vec3(0, 0, 0),
-        glm::vec3(1, 0, 0),
-        glm::vec3(0, 1, 0),
-        glm::vec3(1, 1, 0),
-        glm::vec3(0, 0, 1),
-        glm::vec3(1, 0, 1),
-        glm::vec3(0, 1, 1),
-        glm::vec3(1, 1, 1)
-    };
-
-    return glm::vec3(
-        min.x + offsets[index].x * (max.x - min.x),
-        min.y + offsets[index].y * (max.y - min.y),
-        min.z + offsets[index].z * (max.z - min.z)
-    );
-}
 
 // Expand AABB to include a new point
 void AABB::expand(const glm::vec3& point) {

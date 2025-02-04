@@ -39,6 +39,27 @@ float generateFromNormal() {
     return dis(gen);
 }
 
+struct FPSCounter {
+    double prevTime = 0.0;
+    double currTime = 0.0;
+    double timeDiff;
+    unsigned int counter = 0;
+
+    void outputFPS() {
+        printf("\x1b[d");
+        printf("\x1b[2J");
+        currTime = glfwGetTime();
+        timeDiff = currTime - prevTime;
+        counter++;
+        if (timeDiff >= 1.0 / 30.0) {
+            double FPS = (1.0 / timeDiff) * counter;
+            cout << "FPS: " << FPS << endl;
+            prevTime = currTime;
+            counter = 0;
+        }
+    };
+};
+
 int main(void)
 {
     GLFWwindow* window;
@@ -105,21 +126,16 @@ int main(void)
     glEnable(GL_MULTISAMPLE);
     glDepthFunc(GL_LESS);
 
-    double prevTime = 0.0;
-    double currTime = 0.0;
-    double timeDiff;
-    unsigned int counter = 0;
-
     glfwSwapInterval(1);
     
     WireframeToggler wireframetoggler(window);
-    
+    FPSCounter fpsCounter;
     Ray ray;
 
     std::vector<glm::mat4> transforms = {};
     // if (box.ibo.numInstances < box.ibo.maxInstances) {
-    for (int i = 0; i < 10000; ++i) {
-        transform = glm::translate(glm::mat4(1.0f), 500.0f * glm::vec3(generateFromNormal(), generateFromNormal(), generateFromNormal()));
+    for (int i = 0; i < 100; ++i) {
+        transform = glm::translate(glm::mat4(1.0f), 50.0f * glm::vec3(generateFromNormal(), generateFromNormal(), generateFromNormal()));
         transforms.emplace_back(transform);
     }
     // }
@@ -127,20 +143,9 @@ int main(void)
 
     while (!glfwWindowShouldClose(window))
     {
-        printf("\x1b[d");
-        printf("\x1b[2J");
-        currTime = glfwGetTime();
-        timeDiff = currTime - prevTime;
-        counter++;
-        if (timeDiff >= 1.0 / 30.0) {
-            double FPS = (1.0 / timeDiff) * counter;
-            cout << "FPS: " << FPS << endl;
-            prevTime = currTime;
-            counter = 0;
-        }
-
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        fpsCounter.outputFPS();
         wireframetoggler.toggleWireframe(window);
 
 		timeValue = glfwGetTime();
@@ -150,9 +155,9 @@ int main(void)
         camera.Inputs(window);
         camera.updateMatrix();
 
-        if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS) {
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
             glm::vec3 rayWorld = ray.calculateRayWorld(window, &camera, mode);
-            for (int i = box.ibo.aabbs.size() - 1; i >= 0; --i) {
+            for (int i = 0; i < box.ibo.aabbs.size(); ++i) {
                 float tMin = 0.1f;
                 float tMax = 1000.0f;
                 if (box.ibo.aabbs[i].rayIntersects(camera.Position, rayWorld, tMin, tMax)) {

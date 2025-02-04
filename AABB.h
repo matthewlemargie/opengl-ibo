@@ -17,7 +17,6 @@ public:
     AABB(const glm::vec3& min, const glm::vec3& max);
 
     // Methods
-    glm::vec3 getCorner(int index) const;
     bool intersects(const AABB& other) const;  // Check if two AABBs overlap
     bool contains(const glm::vec3& point) const; // Check if a point is inside
     void expand(const glm::vec3& point); // Expand AABB to include a point

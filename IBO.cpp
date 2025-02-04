@@ -35,13 +35,12 @@ void IBO::deleteInstance(int idx) {
 
     // Move last instance into the deleted spot (swap-and-pop)
     glm::mat4 lastInstance = instances.back();
-    instances[idx] = instances.back();
+    instances[idx] = lastInstance;
     instances.pop_back();
     aabbs[idx] = aabbs.back();
     aabbs.pop_back();
     numInstances--;
 
-    // Update entire buffer
     glBindBuffer(GL_ARRAY_BUFFER, ID);
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * idx, sizeof(glm::mat4), &lastInstance);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
