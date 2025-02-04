@@ -14,7 +14,7 @@ glm::vec3 Ray::calculateRayWorldFromNDC(float xNDC, float yNDC, Camera camera) {
     return rayWorld;
 }
 
-void Ray::calculateRayWorld(GLFWwindow* window, const Camera* camera, const GLFWvidmode* mode){
+glm::vec3 Ray::calculateRayWorld(GLFWwindow* window, const Camera* camera, const GLFWvidmode* mode){
     double mouseX, mouseY;
     glfwGetCursorPos(window, &mouseX, &mouseY);
 	float xNDC = ((2.0f * mouseX) / mode->width - 1.0f);
@@ -29,6 +29,10 @@ void Ray::calculateRayWorld(GLFWwindow* window, const Camera* camera, const GLFW
 	glm::mat4 inverseView = glm::inverse(camera->view);
 	glm::vec3 rayWorld = glm::normalize(glm::vec3(inverseView * rayView));
 
+    return rayWorld;
+}
+
+void Ray::createRayLine(glm::vec3 rayWorld, const Camera* camera) {
     glm::vec3 lineVertices[] = {
         camera->Position,
         camera->Position + rayWorld * camera->farPlane
@@ -55,8 +59,10 @@ void Ray::drawRay(GLFWwindow* window, Camera* camera, const GLFWvidmode* mode, S
     if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
         resetRay();
 
-    if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
-        calculateRayWorld(window, camera, mode);
+    if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) {
+        glm::vec3 rayWorld = calculateRayWorld(window, camera, mode);
+        createRayLine(rayWorld, camera);
+    }
     if (VAO != 0) {
         shader->Activate();
         camera->Matrix(*shader, "camMatrix");

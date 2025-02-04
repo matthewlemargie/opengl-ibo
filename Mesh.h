@@ -7,10 +7,12 @@
 
 #include "ModelLoader.h"
 #include "VAO.h"
+#include "VBO.h"
 #include "IBO.h"
 #include "EBO.h"
 #include "Texture.h"
 #include "Camera.h"
+#include "AABB.h"
 
 
 struct Mesh
@@ -27,6 +29,7 @@ struct Mesh
     std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
     std::vector<glm::mat4> instanceMats;
+    AABB modelAABB;
 
     VAO vao;
     VBO vbo;
@@ -34,7 +37,7 @@ struct Mesh
 
     int numInstances = 0;
 
-    Mesh(const std::string& model);
+    Mesh(const std::string& model, float scale);
 
     void addInstance(std::vector<glm::mat4> instanceMats);
     void Draw(Shader& shader, Camera& camera, glm::vec3 lightPos, glm::vec4 lightColor);

@@ -9,15 +9,21 @@
 #include <vector>
 
 #include "VBO.h"
+#include "AABB.h"
 
 struct IBO
 {
 	GLuint ID;
 	int numInstances = 0;
-	int maxInstances = 1000;
+	int maxInstances = 100000;
+    std::vector<glm::mat4> instances;
+    std::vector<AABB> aabbs;
+
 	IBO();
 
-	void addInstance(std::vector<glm::mat4>& instanceMats);
+    void addInstance(std::vector<glm::mat4>& instanceMats, AABB modelAABB);
+    void deleteInstance(int idx);
+    void updateBuffer();
 	void Bind();
 	void Unbind();
 	void Delete();

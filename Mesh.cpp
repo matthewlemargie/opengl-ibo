@@ -1,12 +1,15 @@
 #include "Mesh.h"
 
-Mesh::Mesh(const std::string& model)
+Mesh::Mesh(const std::string& model, float scale)
 {
 	Model modelData;
 	modelData.load(model);
-	this->vertices = modelData.getVertices();
-	this->indices = modelData.getIndices();
+	vertices = modelData.getVertices();
+	indices = modelData.getIndices();
 
+    for (const auto& vertex : vertices) {
+        modelAABB.expand(scale * vertex.position);
+    }
 
 	vao.Bind();
 
@@ -25,7 +28,7 @@ Mesh::Mesh(const std::string& model)
 void Mesh::addInstance(std::vector<glm::mat4> instanceMats) {
     vao.Bind();
     ibo.Bind();
-    ibo.addInstance(instanceMats);
+    ibo.addInstance(instanceMats, modelAABB);
     ibo.Unbind();
     vao.Unbind();
 }
@@ -80,7 +83,7 @@ void Mesh::Inputs(GLFWwindow* window)
 		if (firstClick)
 		{
 			// Set the cursor position to the center of the screen only once
-			glfwSetCursorPos(window, width / 2, height / 2);
+			glfwSetCursorPos(window, int(width / 2), int(height / 2));
 			firstClick = false;
 		}
 
@@ -104,7 +107,7 @@ void Mesh::Inputs(GLFWwindow* window)
 		lastY = mouseY;
 
 		// Reset cursor position to center for the next frame
-		glfwSetCursorPos(window, (width / 2), (height / 2));
+		glfwSetCursorPos(window, int(width / 2), int(height / 2));
 	}
 	else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
 	{

@@ -80,10 +80,10 @@ int main(void)
 
     // initialize meshes/camera/shaders/scene/lights
     // Mesh woman("C:/Users/matth/Downloads/woman_low.obj", "C:/Users/matth/Downloads/woman_med.obj", "C:/Users/matth/Downloads/woman_high.obj");
-    Mesh box("box.obj");
+    float scale = 5.0f;
+    Mesh box("box.obj", scale);
 
     Camera camera(mode->width, mode->height, glm::vec3(4.0f, 0.0f, 0.0f), 90.0f, 1.0f, 1000.0f);
-    Camera camera2(mode->width, mode->height, glm::vec3(4.0f, 0.0f, 0.0f), 45.0f, 1.0f, 200.0f);
 
     Shader shader("default.vert", "default.frag");
     Shader rayShader("ray.vert", "ray.frag");
@@ -95,7 +95,6 @@ int main(void)
 
     glm::mat4 transform = glm::mat4(1.0f);
 
-    float scale;
     float timeValue = 0;
     float phase = 2.0f * 0.015625f;
 
@@ -116,6 +115,15 @@ int main(void)
     WireframeToggler wireframetoggler(window);
     
     Ray ray;
+
+    std::vector<glm::mat4> transforms = {};
+    // if (box.ibo.numInstances < box.ibo.maxInstances) {
+    for (int i = 0; i < 10000; ++i) {
+        transform = glm::translate(glm::mat4(1.0f), 500.0f * glm::vec3(generateFromNormal(), generateFromNormal(), generateFromNormal()));
+        transforms.emplace_back(transform);
+    }
+    // }
+    box.addInstance(transforms);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -139,21 +147,21 @@ int main(void)
 		lightPos = 10.0f * glm::vec3(sin(timeValue), 0.5f * sin(8.0f * timeValue), cos(timeValue));
         scale = 5.0f + abs(1.0f * cos(2.0f * timeValue));
 
-        std::vector<glm::mat4> transforms = {};
-        if (box.ibo.numInstances < box.ibo.maxInstances)
-        {
-            for (int i = 0; i < 1; ++i) {
-                transform = glm::translate(glm::mat4(1.0f), 500.0f * glm::vec3(generateFromNormal(), generateFromNormal(), generateFromNormal()));
-                transforms.emplace_back(transform);
-            }
-        }
-        box.addInstance(transforms);
-
         camera.Inputs(window);
         camera.updateMatrix();
 
+        if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS) {
+            glm::vec3 rayWorld = ray.calculateRayWorld(window, &camera, mode);
+            for (int i = box.ibo.aabbs.size() - 1; i >= 0; --i) {
+                float tMin = 0.1f;
+                float tMax = 1000.0f;
+                if (box.ibo.aabbs[i].rayIntersects(camera.Position, rayWorld, tMin, tMax)) {
+                    box.ibo.deleteInstance(i);
+                }
+            }
+        }
+
         ray.drawRay(window, &camera, mode, &rayShader);
-        
         scene.Render(camera, lightPos, lightColor, scale);
 
         glfwSwapBuffers(window);
