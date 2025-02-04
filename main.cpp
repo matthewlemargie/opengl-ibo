@@ -46,6 +46,10 @@ int main(void)
     if (!glfwInit())
         return -1;
 
+    unsigned int samples = 8;
+
+    glfwWindowHint(GLFW_SAMPLES, samples);
+
     // initiliaze monitor/window/mode
     GLFWmonitor* monitor = glfwGetPrimaryMonitor();
     if (!monitor) {
@@ -98,9 +102,33 @@ int main(void)
 
 	glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_MULTISAMPLE);
+    glDepthFunc(GL_LESS);
+
+    double prevTime = 0.0;
+    double currTime = 0.0;
+    double timeDiff;
+    unsigned int counter = 0;
+
+    bool wireframeMode = false;
+    bool keyPressedLastFrame = false;
+
+    // glfwSwapInterval(0);
 
     while (!glfwWindowShouldClose(window))
     {
+        printf("\x1b[d");
+        printf("\x1b[2J");
+        currTime = glfwGetTime();
+        timeDiff = currTime - prevTime;
+        counter++;
+        if (timeDiff >= 1.0 / 30.0) {
+            double FPS = (1.0 / timeDiff) * counter;
+            cout << "FPS: " << FPS << endl;
+            prevTime = currTime;
+            counter = 0;
+        }
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		timeValue = glfwGetTime();
@@ -132,7 +160,26 @@ int main(void)
 			// camera.drawFrustum(rayShader, camera2.projection, camera2.view);
         // }
         // else {
-            scene.Render(camera, lightPos, lightColor, scale);
+        // Inside your rendering loop
+        if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) {
+            if (!keyPressedLastFrame) {  // Check if the key was not pressed last frame
+                // Toggle the wireframe mode when the key is first pressed
+                if (!wireframeMode) {
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // Enable wireframe mode
+                    wireframeMode = true;
+                } else {
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  // Revert to solid mode
+                    wireframeMode = false;
+                }
+
+                // Mark that the key has been pressed in this frame
+                keyPressedLastFrame = true;
+            }
+        } else {
+            // If the key is released, mark that it's not pressed anymore
+            keyPressedLastFrame = false;
+        }
+        scene.Render(camera, lightPos, lightColor, scale);
 			// camera2.drawFrustum(rayShader, camera.projection, camera.view);
         // }
 

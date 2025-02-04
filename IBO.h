@@ -15,7 +15,7 @@ class IBO
 public:
 	GLuint ID;
 	int numInstances = 0;
-	int maxInstances = 10000;
+	int maxInstances = 1000;
 	IBO();
 
 	void addInstance(std::vector<glm::mat4>& instanceMats);
