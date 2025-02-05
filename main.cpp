@@ -130,7 +130,6 @@ int main(void)
     
     WireframeToggler wireframetoggler(window);
     FPSCounter fpsCounter;
-    Ray ray;
 
     std::vector<glm::mat4> transforms = {};
     // if (box.ibo.numInstances < box.ibo.maxInstances) {
@@ -155,19 +154,7 @@ int main(void)
         camera.Inputs(window);
         camera.updateMatrix();
 
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-            glm::vec3 rayWorld = ray.calculateRayWorld(window, &camera, mode);
-            for (int i = 0; i < box.ibo.aabbs.size(); ++i) {
-                float tMin = 0.1f;
-                float tMax = 1000.0f;
-                if (box.ibo.aabbs[i].rayIntersects(camera.Position, rayWorld, tMin, tMax)) {
-                    box.ibo.deleteInstance(i);
-                }
-            }
-        }
-
-        ray.drawRay(window, &camera, mode, &rayShader);
-        scene.Render(camera, lightPos, lightColor, scale);
+        scene.Render(window, mode, camera, lightPos, lightColor, scale);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

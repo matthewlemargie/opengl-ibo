@@ -21,7 +21,7 @@ void Scene::addObject(Mesh& mesh, Shader& shader, glm::mat4 modelMatrix) {
     }
 }
 
-	void Scene::Render(Camera& camera, glm::vec3 lightPos, glm::vec4 lightColor, float scale) {
+	void Scene::Render(GLFWwindow* window, const GLFWvidmode* mode, Camera& camera, glm::vec3 lightPos, glm::vec4 lightColor, float scale) {
     for (auto it = shaderMap.begin(); it != shaderMap.end(); ++it) {
         Shader* shader = it->first;
         std::set<Mesh*> meshes = it->second;
@@ -33,6 +33,7 @@ void Scene::addObject(Mesh& mesh, Shader& shader, glm::mat4 modelMatrix) {
         camera.Matrix(*shader, "camMatrix");
 
         for (auto& mesh : meshes) {
+            deleteMeshInstanceByRay(*mesh, window, mode, &camera);
             mesh->Draw(*shader, camera, lightPos, lightColor);
         }
     }

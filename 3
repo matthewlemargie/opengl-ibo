@@ -46,9 +46,9 @@ glm::vec3 calculateRayWorldFromCamera(float xNDC, double yNDC, glm::mat4 project
     return rayWorld;
 }
 
-void deleteMeshInstanceByRay(Mesh& mesh, GLFWwindow* window, const GLFWvidmode* mode, Camera* camera) {
+void deleteMeshInstanceByRay(glm::vec3 rayWorld, Mesh& mesh, GLFWwindow* window, GLFWvidmode* mode, Camera* camera) {
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-        glm::vec3 rayWorld = calculateRayWorld(window, camera, mode);
+        glm::vec3 rayWorld = calculateRayWorld(window, &camera, mode);
         for (int i = 0; i < mesh.ibo.aabbs.size(); ++i) {
             float tMin = 0.1f;
             float tMax = 1000.0f;
