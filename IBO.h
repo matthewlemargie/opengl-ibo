@@ -14,8 +14,7 @@
 struct IBO
 {
 	GLuint ID;
-	int numInstances = 0;
-	int maxInstances = 1000;
+	int maxInstances = 100000;
     std::vector<glm::mat4> instances;
     std::vector<AABB> aabbs;
 

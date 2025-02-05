@@ -38,7 +38,7 @@ void Mesh::Draw(Shader& shader, Camera& camera, glm::vec3 lightPos, glm::vec4 li
 	shader.Activate();
 	//glUniform3f(glGetUniformLocation(shader.ID, "camPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 	vao.Bind();
-	glDrawElementsInstanced(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0, ibo.numInstances);
+	glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0, ibo.instances.size());
     vao.Unbind();
 }
 

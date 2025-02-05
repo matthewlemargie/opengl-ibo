@@ -104,7 +104,7 @@ int main(void)
     float scale = 5.0f;
     Mesh box("box.obj", scale);
 
-    Camera camera(mode->width, mode->height, glm::vec3(4.0f, 0.0f, 0.0f), 90.0f, 1.0f, 1000.0f);
+    Camera camera(mode->width, mode->height, glm::vec3(4.0f, 0.0f, 0.0f), 90.0f, 1.0f, 5000.0f);
 
     Shader shader("default.vert", "default.frag");
     Shader rayShader("ray.vert", "ray.frag");
@@ -134,8 +134,8 @@ int main(void)
 
     std::vector<glm::mat4> transforms = {};
     // if (box.ibo.numInstances < box.ibo.maxInstances) {
-    for (int i = 0; i < 100; ++i) {
-        transform = glm::translate(glm::mat4(1.0f), 50.0f * glm::vec3(generateFromNormal(), generateFromNormal(), generateFromNormal()));
+    for (int i = 0; i < 10000; ++i) {
+        transform = glm::translate(glm::mat4(1.0f), 500.0f * glm::vec3(generateFromNormal(), generateFromNormal(), generateFromNormal()));
         transforms.emplace_back(transform);
     }
     // }
