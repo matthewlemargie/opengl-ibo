@@ -18,11 +18,33 @@ Mesh::Mesh(const std::string& model, float scale)
 	EBO ebo(indices);
 	vao.LinkAttrib(vbo, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, position));
 	vao.LinkAttrib(vbo, 1, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+	vao.LinkAttrib(vbo, 2, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, texUV));
 	vao.LinkInstance(ibo);
 
 	vao.Unbind();
 	vbo.Unbind();
 	ebo.Unbind();
+}
+
+Mesh::Mesh(GLfloat* vertices, size_t vertexSize, GLuint* indices, size_t indexSize)
+{
+    this->faceVertices = vertices;
+    this->faceIndices = indices;
+    this->faceVertexSize = vertexSize;
+    this->faceIndexSize = indexSize;
+
+    vao.Bind();
+    vbo.addVertices(vertices, vertexSize);
+    EBO ebo(indices, indexSize);
+    
+    vao.LinkAttrib(vbo, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
+    vao.LinkAttrib(vbo, 1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    vao.LinkAttrib(vbo, 2, 2, GL_FLOAT, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	vao.LinkFaceInstance(ibo);
+
+    vao.Unbind();
+    vbo.Unbind();
+    ebo.Unbind();
 }
 
 void Mesh::addInstance(std::vector<glm::mat4> instanceMats) {
@@ -33,12 +55,26 @@ void Mesh::addInstance(std::vector<glm::mat4> instanceMats) {
     vao.Unbind();
 }
 
+void Mesh::addFaceInstance(std::vector<glm::mat4> instanceMats) {
+    vao.Bind();
+    ibo.Bind();
+    ibo.addInstance(instanceMats);
+    ibo.Unbind();
+    vao.Unbind();
+}
+
 void Mesh::Draw(Shader& shader, Camera& camera, glm::vec3 lightPos, glm::vec4 lightColor)
 {
-	shader.Activate();
 	//glUniform3f(glGetUniformLocation(shader.ID, "camPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 	vao.Bind();
 	glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0, ibo.instances.size());
+    vao.Unbind();
+}
+
+void Mesh::draw(Shader& shader, Camera& camera, glm::vec3 lightPos, glm::vec4 lightColor)
+{
+	vao.Bind();
+	glDrawElementsInstanced(GL_TRIANGLES, faceIndexSize / sizeof(GLuint), GL_UNSIGNED_INT, 0, ibo.instances.size());
     vao.Unbind();
 }
 

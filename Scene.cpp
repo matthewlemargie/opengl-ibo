@@ -21,7 +21,26 @@ void Scene::addObject(Mesh& mesh, Shader& shader, glm::mat4 modelMatrix) {
     }
 }
 
-	void Scene::Render(GLFWwindow* window, const GLFWvidmode* mode, Camera& camera, glm::vec3 lightPos, glm::vec4 lightColor, float scale) {
+void Scene::addFace(Mesh& mesh, Shader& shader, glm::mat4 modelMatrix) {
+    std::vector<glm::mat4> model;
+    model.emplace_back(modelMatrix);
+    mesh.addFaceInstance(model);
+
+    Mesh* meshPtr = &mesh;
+    Shader* shaderPtr = &shader;
+
+    if (faceShaderMap.find(shaderPtr) != faceShaderMap.end()) {
+        if (faceShaderMap[shaderPtr].find(meshPtr) == faceShaderMap[shaderPtr].end()) {
+            faceShaderMap[shaderPtr].insert(meshPtr);
+        }
+    }
+    else {
+		faceShaderMap[shaderPtr].insert(meshPtr);
+        faceShaderMap[shaderPtr] = { meshPtr };
+    }
+}
+
+void Scene::Render(GLFWwindow* window, const GLFWvidmode* mode, Camera& camera, glm::vec3 lightPos, glm::vec4 lightColor, float scale) {
     for (auto it = shaderMap.begin(); it != shaderMap.end(); ++it) {
         Shader* shader = it->first;
         std::set<Mesh*> meshes = it->second;
@@ -37,5 +56,21 @@ void Scene::addObject(Mesh& mesh, Shader& shader, glm::mat4 modelMatrix) {
             mesh->Draw(*shader, camera, lightPos, lightColor);
         }
     }
+
+    for (auto it = faceShaderMap.begin(); it != faceShaderMap.end(); ++it) {
+        Shader* shader = it->first;
+        std::set<Mesh*> meshes = it->second;
+
+        shader->Activate();
+		glUniform4f(glGetUniformLocation(shader->ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+		glUniform3f(glGetUniformLocation(shader->ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+        camera.Matrix(*shader, "camMatrix");
+
+        for (auto& mesh : meshes) {
+            mesh->draw(*shader, camera, lightPos, lightColor);
+        }
+    }
 }
 
+void Scene::faceRender(GLFWwindow* window, const GLFWvidmode* mode, Camera& camera, glm::vec3 lightPos, glm::vec4 lightColor, float scale) {
+}

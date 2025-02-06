@@ -8,6 +8,7 @@ struct EBO
 {
 	GLuint ID;
 	EBO(std::vector<GLuint>& indices);
+    EBO(GLuint* indices, size_t size);
 	void Bind();
 	void Unbind();
 	void Delete();

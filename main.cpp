@@ -7,6 +7,7 @@
 #include <iostream>
 #include <random>
 
+#include "VBO.h"
 #include "Wireframe.h"
 #include "calculateRays.h"
 #include "ModelLoader.h"
@@ -108,6 +109,7 @@ int main(void)
 
     Shader shader("default.vert", "default.frag");
     Shader rayShader("ray.vert", "ray.frag");
+    Shader faceShader("face.vert", "face.frag");
 
     Scene scene(&camera);
 
@@ -119,8 +121,6 @@ int main(void)
     float timeValue = 0;
     float phase = 2.0f * 0.015625f;
 
-	scene.addObject(box, shader, transform);
-
 	glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
@@ -131,20 +131,49 @@ int main(void)
     WireframeToggler wireframetoggler(window);
     FPSCounter fpsCounter;
 
+    scene.addObject(box, shader, transform);
     std::vector<glm::mat4> transforms = {};
     // if (box.ibo.numInstances < box.ibo.maxInstances) {
-    for (int i = 0; i < 10000; ++i) {
+    for (int i = 0; i < 1000; ++i) {
         transform = glm::translate(glm::mat4(1.0f), 500.0f * glm::vec3(generateFromNormal(), generateFromNormal(), generateFromNormal()));
         transforms.emplace_back(transform);
     }
     // }
     box.addInstance(transforms);
 
+    GLfloat faceVertices[] = {
+        // position                normals                  UVs
+        -10.0f, 10.0f, 0.0f,       0.0f, 0.0f, 1.0f,        0.0f, 1.0f, // top left 
+        10.0f, 10.0f, 0.0f,        0.0f, 0.0f, 1.0f,        1.0f, 1.0f, // top right 
+        -10.0f, -10.0f, 0.0f,      0.0f, 0.0f, 1.0f,        0.0f, 0.0f, // bottom left
+        10.0f, -10.0f, 0.0f,       0.0f, 0.0f, 1.0f,        1.0f, 0.0f, // bottom right
+    };
+
+    GLuint faceIndices[] = {
+        0, 1, 2,
+        3, 1, 2, 
+    };
+
+
+    Mesh face(faceVertices, sizeof(faceVertices), faceIndices, sizeof(faceIndices));
+    transform = glm::mat4(1.0f);
+    transforms.clear();
+    scene.addFace(face, faceShader, transform);
+    for (int i = 0; i < 1000; ++i) {
+        transform = glm::translate(glm::mat4(1.0f), 500.0f * glm::vec3(generateFromNormal(), generateFromNormal(), generateFromNormal()));
+        transforms.emplace_back(transform);
+    }
+    face.addFaceInstance(transforms);
+
+    Texture grass("grass.jpg", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
+    grass.texUnit(shader, "tex0", 0);
+    grass.Bind();
+
     while (!glfwWindowShouldClose(window))
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        fpsCounter.outputFPS();
+        // fpsCounter.outputFPS();
         wireframetoggler.toggleWireframe(window);
 
 		timeValue = glfwGetTime();
@@ -161,6 +190,7 @@ int main(void)
     }
 	shader.Delete();
     rayShader.Delete();
+    faceShader.Delete();
 
     glfwTerminate();
     return 0;

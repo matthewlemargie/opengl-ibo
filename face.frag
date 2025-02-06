@@ -2,6 +2,7 @@
 
 in vec3 fragNormal;
 in vec3 crntPos;
+in vec2 aTexCoord;
 out vec4 FragColor;
 
 uniform vec4 lightColor;
@@ -22,5 +23,5 @@ void main()
     float diffuse = max(dot(normal, lightDirection), 0.0f);
 
     // Set the fragment color
-    FragColor = lightColor * strength * diffuse;
+    FragColor = texture(tex0, aTexCoord);
 }

@@ -13,10 +13,13 @@
 
 struct Scene {
     std::map<Shader*, std::set<Mesh*>> shaderMap;
+    std::map<Shader*, std::set<Mesh*>> faceShaderMap;
     Camera* sceneCam;
 
     Scene(Camera* camera);
 
     void addObject(Mesh& mesh, Shader& shader, glm::mat4 modelMatrix);
+    void addFace(Mesh& mesh, Shader& shader, glm::mat4 modelMatrix);
 	void Render(GLFWwindow* window, const GLFWvidmode* mode, Camera& camera, glm::vec3 lightPos, glm::vec4 lightColor, float scale);
+    void faceRender(GLFWwindow* window, const GLFWvidmode* mode, Camera& camera, glm::vec3 lightPos, glm::vec4 lightColor, float scale);
 };

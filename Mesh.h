@@ -28,6 +28,12 @@ struct Mesh
 
     std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
+
+    GLfloat* faceVertices;
+    GLuint* faceIndices;
+    size_t faceVertexSize;
+    size_t faceIndexSize;
+
     std::vector<glm::mat4> instanceMats;
     AABB modelAABB;
 
@@ -38,9 +44,12 @@ struct Mesh
     int numInstances = 0;
 
     Mesh(const std::string& model, float scale);
+    Mesh(GLfloat* vertices, size_t vertexSize, GLuint* indices, size_t indexSize);
 
     void addInstance(std::vector<glm::mat4> instanceMats);
+    void addFaceInstance(std::vector<glm::mat4> instanceMats);
     void Draw(Shader& shader, Camera& camera, glm::vec3 lightPos, glm::vec4 lightColor);
+    void draw(Shader& shader, Camera& camera, glm::vec3 lightPos, glm::vec4 lightColor);
 
     void Inputs(GLFWwindow* window);
 };

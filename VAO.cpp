@@ -25,6 +25,17 @@ void VAO::LinkInstance(IBO& IBO)
 	IBO.Unbind();
 }
 
+void VAO::LinkFaceInstance(IBO& IBO)
+{
+	IBO.Bind();
+	for (GLuint i = 0; i < 4; ++i) {
+		glVertexAttribPointer(3 + i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(i * sizeof(glm::vec4))) ;
+		glEnableVertexAttribArray(3 + i);
+		glVertexAttribDivisor(3 + i, 1);
+	}
+	IBO.Unbind();
+}
+
 void VAO::Bind()
 {
 	glBindVertexArray(ID);

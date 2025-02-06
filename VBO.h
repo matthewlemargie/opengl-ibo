@@ -12,7 +12,7 @@ struct Vertex
 {
 	glm::vec3 position;
 	glm::vec3 normal;
-	//glm::vec2 texUV;
+	glm::vec2 texUV;
 };
 
 struct VBO
@@ -21,6 +21,7 @@ struct VBO
 	VBO();
 
 	void addVertices(std::vector<Vertex>& vertices);
+    void addVertices(GLfloat* vertices, size_t size);
 	void Bind();
 	void bindInstance();
 	void Unbind();

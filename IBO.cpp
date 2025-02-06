@@ -27,6 +27,18 @@ void IBO::addInstance(std::vector<glm::mat4>& instanceMats, AABB modelAABB) {
     instances.insert(instances.end(), instanceMats.begin(), instanceMats.end());
 }
 
+void IBO::addInstance(std::vector<glm::mat4>& instanceMats) {
+    if (instances.size() + instanceMats.size() > maxInstances) {
+        return;
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, ID);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * instances.size(), sizeof(glm::mat4) * instanceMats.size(), instanceMats.data());
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    instances.insert(instances.end(), instanceMats.begin(), instanceMats.end());
+}
+
 void IBO::deleteInstance(int idx) {
     if (idx < 0 || idx >= instances.size()) {
         return;
