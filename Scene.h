@@ -11,14 +11,18 @@
 #include "Camera.h"
 #include "VAO.h"
 #include "calculateRays.h"
+#include "block.h"
 
 struct Scene {
     std::set<Mesh*> meshes;
+    std::set<Block*> blocks;
+    GLFWwindow* sceneWindow;
+    const GLFWvidmode* sceneMode;
     Camera* sceneCam;
 
-    Scene(Camera* camera);
+    Scene(GLFWwindow* window, const GLFWvidmode* mode, Camera* camera);
 
-    void addObject(Mesh& mesh, glm::mat4 modelMatrix);
-    void addObjects(Mesh& mesh, std::vector<glm::mat4> modelMatrices);
-	void Render(GLFWwindow* window, const GLFWvidmode* mode);
+    void addObject(Mesh& mesh);
+    void addBlock(Block& block);
+	void Render();
 };

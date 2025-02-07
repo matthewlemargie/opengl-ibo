@@ -23,6 +23,6 @@ void main()
     float diffuse = max(dot(normal, lightDirection), 0.0f);
 
     // Set the fragment color
-    FragColor = texture(tex0, aTexCoord) * lightColor * strength * diffuse;
-    // FragColor = texture(tex0, aTexCoord);
+    // FragColor = texture(tex0, aTexCoord) * lightColor * strength * diffuse;
+    FragColor = texture(tex0, aTexCoord);
 }

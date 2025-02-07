@@ -2,10 +2,10 @@
 
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
-layout (location = 2) in vec4 col0;
-layout (location = 3) in vec4 col1;
-layout (location = 4) in vec4 col2;
-layout (location = 5) in vec4 col3;
+layout (location = 3) in vec4 col0;
+layout (location = 4) in vec4 col1;
+layout (location = 5) in vec4 col2;
+layout (location = 6) in vec4 col3;
 
 uniform float scale;
 uniform mat4 camMatrix;

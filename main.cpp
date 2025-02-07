@@ -62,6 +62,13 @@ struct FPSCounter {
     };
 };
 
+struct GLContext {
+    GLFWwindow* window;
+    GLFWmonitor* monitor;
+    const GLFWvidmode* mode;
+    GLContext() {}
+};
+
 int main(void)
 {
     GLFWwindow* window;
@@ -105,20 +112,36 @@ int main(void)
     // Mesh woman("C:/Users/matth/Downloads/woman_low.obj", "C:/Users/matth/Downloads/woman_med.obj", "C:/Users/matth/Downloads/woman_high.obj");
     float scale = 5.0f;
 
-    Camera camera(mode->width, mode->height, glm::vec3(4.0f, 0.0f, 0.0f), 90.0f, 1.0f, 5000.0f);
+    Camera camera(mode->width, mode->height, glm::vec3(4.0f, 0.0f, 0.0f), 60.0f, 1.0f, 5000.0f);
 
-    Scene scene(&camera);
+    Scene scene(window, mode, &camera);
 
     Shader shader("default.vert", "default.frag");
-    Shader rayShader("ray.vert", "ray.frag");
     Shader faceShader("face.vert", "face.frag");
+    // Shader rayShader("ray.vert", "ray.frag");
 
     glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
     glm::vec4 lightColor = glm::vec4(0.5f, 0.7f, 0.4f, 1.0f);
 
     Mesh box("box.obj", shader, scale, lightColor, lightPos);
-
     glm::mat4 transform = glm::mat4(1.0f);
+    std::vector<glm::mat4> transforms = {};
+    for (int i = 0; i < 1000; ++i) {
+        transform = glm::translate(glm::mat4(1.0f), 500.0f * glm::vec3(generateFromNormal(), generateFromNormal(), generateFromNormal()));
+        transforms.emplace_back(transform);
+    }
+    scene.addObject(box);
+    box.addInstance(transforms);
+
+    Block block(scale, lightColor, lightPos);
+    transform = glm::mat4(1.0f);
+    transforms.clear();
+    for (int i = 0; i < 5000; ++i) {
+        transform = glm::translate(glm::mat4(1.0f), 500.0f * glm::vec3(generateFromNormal(), generateFromNormal(), generateFromNormal()));
+        transforms.emplace_back(transform);
+    }
+    scene.addBlock(block);
+    block.addInstance(transforms);
 
     float timeValue = 0;
     float phase = 2.0f * 0.015625f;
@@ -127,28 +150,10 @@ int main(void)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
     glDepthFunc(GL_LESS);
-
     glfwSwapInterval(1);
 
     WireframeToggler wireframetoggler(window);
     FPSCounter fpsCounter;
-
-    std::vector<glm::mat4> transforms = {};
-    for (int i = 0; i < 1000; ++i) {
-        transform = glm::translate(glm::mat4(1.0f), 500.0f * glm::vec3(generateFromNormal(), generateFromNormal(), generateFromNormal()));
-        transforms.emplace_back(transform);
-    }
-    scene.addObjects(box, transforms);
-
-    Block block(camera, scale, lightColor, lightPos);
-    transform = glm::mat4(1.0f);
-    transforms.clear();
-    // scene.addFace(face, faceShader, transform);
-    for (int i = 0; i < 10000; ++i) {
-        transform = glm::translate(glm::mat4(1.0f), 500.0f * glm::vec3(generateFromNormal(), generateFromNormal(), generateFromNormal()));
-        transforms.emplace_back(transform);
-    }
-    block.addFaceInstance(transforms);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -164,14 +169,13 @@ int main(void)
         camera.Inputs(window);
         camera.updateMatrix();
 
-        scene.Render(window, mode);
-        block.drawCube();
+        scene.Render();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 	shader.Delete();
-    rayShader.Delete();
+    // rayShader.Delete();
     faceShader.Delete();
 
     glfwTerminate();

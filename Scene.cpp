@@ -1,28 +1,23 @@
 #include "Scene.h"
 
-Scene::Scene(Camera* camera) : sceneCam(camera) {}
+Scene::Scene(GLFWwindow* window, const GLFWvidmode* mode, Camera* camera) : sceneWindow(window), sceneMode(mode), sceneCam(camera) {}
 
-void Scene::addObject(Mesh& mesh, glm::mat4 modelMatrix) {
-    std::vector<glm::mat4> model;
-    model.emplace_back(modelMatrix);
-    mesh.addInstance(model);
-
-    Mesh* meshPtr = &mesh;
-
-    if (meshes.find(meshPtr) == meshes.end()) {
-        meshes.insert(meshPtr);
-    }
-}
-
-void Scene::addObjects(Mesh& mesh, std::vector<glm::mat4> modelMatrices) {
-    mesh.addInstance(modelMatrices);
+void Scene::addObject(Mesh& mesh) {
     Mesh* meshPtr = &mesh;
     meshes.insert(meshPtr);
 }
 
-void Scene::Render(GLFWwindow* window, const GLFWvidmode* mode) {
+void Scene::addBlock(Block& block) {
+    Block* blockPtr = &block;
+    blocks.insert(blockPtr);
+}
+
+void Scene::Render() {
     for (auto& mesh : meshes) {
-        deleteMeshInstanceByRay(*mesh, window, mode, sceneCam);
+        deleteMeshInstanceByRay(*mesh, sceneWindow, sceneMode, sceneCam);
         mesh->Draw(*sceneCam);
+    }
+    for (auto& block : blocks) {
+        block->drawCube(*sceneCam);
     }
 }

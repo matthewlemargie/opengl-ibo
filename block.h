@@ -13,6 +13,7 @@
 #include "Texture.h"
 #include "shaderClass.h"
 #include "Camera.h"
+#include "AABB.h"
 
 struct Block {
     GLfloat cubeVertices[192] = {
@@ -73,7 +74,6 @@ struct Block {
     VBO vbo;
     IBO ibo;
 
-    Camera* camera;
     Texture* grass;
     Shader* shader;
 
@@ -81,18 +81,20 @@ struct Block {
     glm::vec4* lightColor;
     glm::vec3* lightPos;
 
-    Block(Camera& camera, float& scale, glm::vec4& lightColor, glm::vec3& lightPos);
+    AABB modelAABB;
+
+    Block(float& scale, glm::vec4& lightColor, glm::vec3& lightPos);
     ~Block();
 
-    void shaderCameraTextureActivate();
-    void addFaceInstance(std::vector<glm::mat4> instanceMats);
-    void drawCube();
-    void drawTop();
-    void drawBottom();
-    void drawNorth();
-    void drawSouth();
-    void drawEast();
-    void drawWest();
+    void shaderCameraTextureActivate(Camera& camera);
+    void addInstance(std::vector<glm::mat4> instanceMats);
+    void drawCube(Camera& camera);
+    void drawTop(Camera& camera);
+    void drawBottom(Camera& camera);
+    void drawNorth(Camera& camera);
+    void drawSouth(Camera& camera);
+    void drawEast(Camera& camera);
+    void drawWest(Camera& camera);
 };
 
 #endif
