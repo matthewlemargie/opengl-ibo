@@ -41,15 +41,20 @@ struct Mesh
     VBO vbo;
     IBO ibo;
 
+    float* scale;
+    glm::vec4* lightColor;
+    glm::vec3* lightPos;
+    
+    Shader* shader;
+
     int numInstances = 0;
 
-    Mesh(const std::string& model, float scale);
-    Mesh(GLfloat* vertices, size_t vertexSize, GLuint* indices, size_t indexSize);
+    Mesh(const std::string& model, Shader& shader, float& scale, glm::vec4& lightColor, glm::vec3& lightPos);
+    Mesh(GLfloat* vertices, size_t vertexSize, GLuint* indices, size_t indexSize, Shader& shader, float& scale, glm::vec4& lightColor, glm::vec3& lightPos);
 
     void addInstance(std::vector<glm::mat4> instanceMats);
     void addFaceInstance(std::vector<glm::mat4> instanceMats);
-    void Draw(Shader& shader, Camera& camera, glm::vec3 lightPos, glm::vec4 lightColor);
-    void draw(Shader& shader, Camera& camera, glm::vec3 lightPos, glm::vec4 lightColor);
+    void Draw(Camera& camera);
 
     void Inputs(GLFWwindow* window);
 };

@@ -104,18 +104,19 @@ int main(void)
     // initialize meshes/camera/shaders/scene/lights
     // Mesh woman("C:/Users/matth/Downloads/woman_low.obj", "C:/Users/matth/Downloads/woman_med.obj", "C:/Users/matth/Downloads/woman_high.obj");
     float scale = 5.0f;
-    Mesh box("box.obj", scale);
 
     Camera camera(mode->width, mode->height, glm::vec3(4.0f, 0.0f, 0.0f), 90.0f, 1.0f, 5000.0f);
+
+    Scene scene(&camera);
 
     Shader shader("default.vert", "default.frag");
     Shader rayShader("ray.vert", "ray.frag");
     Shader faceShader("face.vert", "face.frag");
 
-    Scene scene(&camera);
-
     glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
     glm::vec4 lightColor = glm::vec4(0.5f, 0.7f, 0.4f, 1.0f);
+
+    Mesh box("box.obj", shader, scale, lightColor, lightPos);
 
     glm::mat4 transform = glm::mat4(1.0f);
 
@@ -132,18 +133,14 @@ int main(void)
     WireframeToggler wireframetoggler(window);
     FPSCounter fpsCounter;
 
-    // scene.addObject(box, shader, transform);
     std::vector<glm::mat4> transforms = {};
-    // if (box.ibo.numInstances < box.ibo.maxInstances) {
     for (int i = 0; i < 1000; ++i) {
         transform = glm::translate(glm::mat4(1.0f), 500.0f * glm::vec3(generateFromNormal(), generateFromNormal(), generateFromNormal()));
         transforms.emplace_back(transform);
     }
-    // }
-    box.addInstance(transforms);
+    scene.addObjects(box, transforms);
 
     Block block(camera, scale, lightColor, lightPos);
-
     transform = glm::mat4(1.0f);
     transforms.clear();
     // scene.addFace(face, faceShader, transform);
@@ -153,15 +150,11 @@ int main(void)
     }
     block.addFaceInstance(transforms);
 
-    // Texture grass("grass.jpg", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
-    // grass.texUnit(shader, "tex0", 0);
-    // grass.Bind();
-
     while (!glfwWindowShouldClose(window))
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // fpsCounter.outputFPS();
+        fpsCounter.outputFPS();
         wireframetoggler.toggleWireframe(window);
 
 		timeValue = glfwGetTime();
@@ -171,7 +164,7 @@ int main(void)
         camera.Inputs(window);
         camera.updateMatrix();
 
-        // scene.Render(window, mode, camera, lightPos, lightColor, scale);
+        scene.Render(window, mode);
         block.drawCube();
 
         glfwSwapBuffers(window);
