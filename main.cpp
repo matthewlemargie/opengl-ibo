@@ -15,6 +15,7 @@
 #include "Camera.h"
 #include "shaderClass.h"
 #include "Scene.h"
+#include "block.h"
 
 float generateRandomFloat() {
     // Create a random device and use it to seed the random number generator
@@ -127,7 +128,7 @@ int main(void)
     glDepthFunc(GL_LESS);
 
     glfwSwapInterval(1);
-    
+
     WireframeToggler wireframetoggler(window);
     FPSCounter fpsCounter;
 
@@ -141,79 +142,25 @@ int main(void)
     // }
     box.addInstance(transforms);
 
-    GLfloat cubeVertices[] = {
-        // Position           // Normal         // UV
-        // Front face
-        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,  // Bottom-left
-        0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f,  // Bottom-right
-        0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,  // Top-right
-        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f,  // Top-left
-
-        // Back face
-        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,  // Bottom-left
-        0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,  // Bottom-right
-        0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,  // Top-right
-        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,  // Top-left
-
-        // Left face
-        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,  // Bottom-left
-        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,  // Bottom-right
-        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,  // Top-right
-        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  // Top-left
-
-        // Right face
-        0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,  // Bottom-left
-        0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,  // Bottom-right
-        0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  // Top-right
-        0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,  // Top-left
-
-        // Top face
-        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,  // Bottom-left
-        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,  // Bottom-right
-        0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,  // Top-right
-        0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,  // Top-left
-
-        // Bottom face
-        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,  // Bottom-left
-        -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,  // Bottom-right
-        0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,  // Top-right
-        0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f   // Top-left
-    };
-
-    GLuint cubeIndices[] = {
-        // Front face
-        0, 1, 2,  2, 3, 0,
-        // Back face
-        4, 5, 6,  6, 7, 4,
-        // Left face
-        8, 9, 10,  10, 11, 8,
-        // Right face
-        12, 13, 14,  14, 15, 12,
-        // Top face
-        16, 17, 18,  18, 19, 16,
-        // Bottom face
-        20, 21, 22,  22, 23, 20
-    };
-
-    Mesh face(cubeVertices, sizeof(cubeVertices), cubeIndices, sizeof(cubeIndices));
+    Block block(camera);
     transform = glm::mat4(1.0f);
     transforms.clear();
-    scene.addFace(face, faceShader, transform);
-    for (int i = 0; i < 1000; ++i) {
+    // scene.addFace(face, faceShader, transform);
+    for (int i = 0; i < 10000; ++i) {
         transform = glm::translate(glm::mat4(1.0f), 500.0f * glm::vec3(generateFromNormal(), generateFromNormal(), generateFromNormal()));
         transforms.emplace_back(transform);
     }
-    face.addFaceInstance(transforms);
+    block.addFaceInstance(transforms);
 
-    Texture grass("grass.jpg", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
-    grass.texUnit(shader, "tex0", 0);
-    grass.Bind();
+    // Texture grass("grass.jpg", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
+    // grass.texUnit(shader, "tex0", 0);
+    // grass.Bind();
 
     while (!glfwWindowShouldClose(window))
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        fpsCounter.outputFPS();
+        // fpsCounter.outputFPS();
         wireframetoggler.toggleWireframe(window);
 
 		timeValue = glfwGetTime();
@@ -223,7 +170,8 @@ int main(void)
         camera.Inputs(window);
         camera.updateMatrix();
 
-        scene.Render(window, mode, camera, lightPos, lightColor, scale);
+        // scene.Render(window, mode, camera, lightPos, lightColor, scale);
+        block.drawCube();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
