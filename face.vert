@@ -18,7 +18,7 @@ out vec2 aTexCoord;
 void main()
 {
 	mat4 instanceModel = mat4(col0, col1, col2, col3);
-    vec4 worldPos = instanceModel * vec4(aPos, 1.0f);
+    vec4 worldPos = instanceModel * vec4(5.0f * aPos, 1.0f);
     crntPos = worldPos.xyz;
 
     mat3 normalMatrix = transpose(inverse(mat3(instanceModel)));
