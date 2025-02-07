@@ -142,7 +142,8 @@ int main(void)
     // }
     box.addInstance(transforms);
 
-    Block block(camera);
+    Block block(camera, scale, lightColor, lightPos);
+
     transform = glm::mat4(1.0f);
     transforms.clear();
     // scene.addFace(face, faceShader, transform);

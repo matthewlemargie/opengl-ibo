@@ -1,6 +1,7 @@
 #include "block.h"
 
-Block::Block(Camera& camera) : camera(&camera) {
+Block::Block(Camera& camera, float& scale, glm::vec4& lightColor, glm::vec3& lightPos) 
+    : camera(&camera), scale(&scale), lightColor(&lightColor), lightPos(&lightPos) {
     vao.Bind();
     vbo.addVertices(cubeVertices, sizeof(cubeVertices));
     EBO ebo(cubeIndices, sizeof(cubeIndices));
@@ -32,9 +33,12 @@ void Block::addFaceInstance(std::vector<glm::mat4> instanceMats) {
 }
 
 void Block::shaderCameraTextureActivate() {
-    shader->Activate();
     grass->texUnit(*shader, "tex0", 0);
     grass->Bind();
+    shader->Activate();
+    glUniform1f(glGetUniformLocation(shader->ID, "scale"), *scale);
+    glUniform4f(glGetUniformLocation(shader->ID, "lightColor"), lightColor->x, lightColor->y, lightColor->z, lightColor->w);
+    glUniform3f(glGetUniformLocation(shader->ID, "lightPos"), lightPos->x, lightPos->y, lightPos->z);
     camera->Matrix(*shader, "camMatrix");
 }
 

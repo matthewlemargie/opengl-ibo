@@ -1,8 +1,10 @@
 #ifndef BLOCK_H
 #define BLOCK_H
+#define GLM_ENABLE_EXPERIMENTAL
 
 #include <GL/glew.h>
 #include <GL/gl.h>
+#include <glm/glm.hpp>
 
 #include "VAO.h"
 #include "VBO.h"
@@ -75,7 +77,11 @@ struct Block {
     Texture* grass;
     Shader* shader;
 
-    Block(Camera& camera);
+    float* scale;
+    glm::vec4* lightColor;
+    glm::vec3* lightPos;
+
+    Block(Camera& camera, float& scale, glm::vec4& lightColor, glm::vec3& lightPos);
     ~Block();
 
     void shaderCameraTextureActivate();
