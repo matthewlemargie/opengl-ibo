@@ -15,6 +15,8 @@ Block::Block(float& scale, glm::vec4& lightColor, glm::vec3& lightPos)
     vbo.Unbind();
     ebo.Unbind();
 
+    modelAABB = AABB(scale * glm::vec3(-0.5f, -0.5f, -0.5f), scale * glm::vec3(0.5f, 0.5f, 0.5f));
+
     grass = new Texture("grass.jpg", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
     shader = new Shader("face.vert", "face.frag");
 }
@@ -27,7 +29,7 @@ Block::~Block() {
 void Block::addInstance(std::vector<glm::mat4> instanceMats) {
     vao.Bind();
     ibo.Bind();
-    ibo.addInstance(instanceMats);
+    ibo.addInstance(instanceMats, modelAABB);
     ibo.Unbind();
     vao.Unbind();
 }

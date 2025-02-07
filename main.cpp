@@ -77,7 +77,7 @@ int main(void)
     if (!glfwInit())
         return -1;
 
-    unsigned int samples = 8;
+    unsigned int samples = 32;
 
     glfwWindowHint(GLFW_SAMPLES, samples);
 
@@ -109,8 +109,7 @@ int main(void)
     }
 
     // initialize meshes/camera/shaders/scene/lights
-    // Mesh woman("C:/Users/matth/Downloads/woman_low.obj", "C:/Users/matth/Downloads/woman_med.obj", "C:/Users/matth/Downloads/woman_high.obj");
-    float scale = 5.0f;
+    float scale = 10.0f;
 
     Camera camera(mode->width, mode->height, glm::vec3(4.0f, 0.0f, 0.0f), 60.0f, 1.0f, 5000.0f);
 
@@ -130,8 +129,8 @@ int main(void)
         transform = glm::translate(glm::mat4(1.0f), 500.0f * glm::vec3(generateFromNormal(), generateFromNormal(), generateFromNormal()));
         transforms.emplace_back(transform);
     }
-    scene.addObject(box);
-    box.addInstance(transforms);
+    // scene.addObject(box);
+    // box.addInstance(transforms);
 
     Block block(scale, lightColor, lightPos);
     transform = glm::mat4(1.0f);
@@ -164,7 +163,7 @@ int main(void)
 
 		timeValue = glfwGetTime();
 		lightPos = 10.0f * glm::vec3(sin(timeValue), 0.5f * sin(8.0f * timeValue), cos(timeValue));
-        scale = 5.0f + abs(1.0f * cos(2.0f * timeValue));
+        scale = 10.0f + abs(cos(2.0f * timeValue));
 
         camera.Inputs(window);
         camera.updateMatrix();
@@ -175,8 +174,8 @@ int main(void)
         glfwPollEvents();
     }
 	shader.Delete();
-    // rayShader.Delete();
     faceShader.Delete();
+    // rayShader.Delete();
 
     glfwTerminate();
     return 0;

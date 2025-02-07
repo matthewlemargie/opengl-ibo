@@ -59,6 +59,19 @@ void deleteMeshInstanceByRay(Mesh& mesh, GLFWwindow* window, const GLFWvidmode* 
     }
 }
 
+void deleteBlockInstanceByRay(Block& block, GLFWwindow* window, const GLFWvidmode* mode, Camera* camera) {
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+        glm::vec3 rayWorld = calculateRayWorld(window, camera, mode);
+        for (int i = 0; i < block.ibo.aabbs.size(); ++i) {
+            float tMin = 0.1f;
+            float tMax = 1000.0f;
+            if (block.ibo.aabbs[i].rayIntersects(camera->Position, rayWorld, tMin, tMax)) {
+                block.ibo.deleteInstance(i);
+            }
+        }
+    }
+}
+
 void Ray::createRayLine(glm::vec3 rayWorld, const Camera* camera) {
     glm::vec3 lineVertices[] = {
         camera->Position,

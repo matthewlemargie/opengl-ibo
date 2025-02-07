@@ -18,6 +18,7 @@ void Scene::Render() {
         mesh->Draw(*sceneCam);
     }
     for (auto& block : blocks) {
+        deleteBlockInstanceByRay(*block, sceneWindow, sceneMode, sceneCam);
         block->drawCube(*sceneCam);
     }
 }
