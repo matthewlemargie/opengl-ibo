@@ -4,124 +4,26 @@
 #include <glm/glm.hpp>
 #include <GLFW/glfw3.h>
 #include <GL/gl.h>
-#include <iostream>
-#include <random>
 
-#include "VBO.h"
-#include "calculateRays.h"
-#include "ModelLoader.h"
+#include "GLContext.h"
 #include "Mesh.h"
 #include "Camera.h"
 #include "shaderClass.h"
 #include "Scene.h"
 #include "block.h"
-#include "skybox.h"
+#include "GenerateRandoms.h"
 
-float generateRandomFloat() {
-    // Create a random device and use it to seed the random number generator
-    std::random_device rd;
-    std::mt19937 gen(rd());  // Mersenne Twister engine
-
-    // Create a uniform distribution in the desired range
-    std::uniform_real_distribution<> dis(-1.0f, 1.0f);
-
-    // Generate and return the random float
-    return dis(gen);
-}
-
-float generateFromNormal() {
-    // Create a random device and use it to seed the random number generator
-    std::random_device rd;
-    std::mt19937 gen(rd());  // Mersenne Twister engine
-
-    // Create a normal distribution in the desired range
-    std::normal_distribution<> dis(0.0f, 1.0f);
-
-    // Generate and return the random float
-    return dis(gen);
-}
-
-struct FPSCounter {
-    double prevTime = 0.0;
-    double currTime = 0.0;
-    double timeDiff;
-    unsigned int counter = 0;
-
-    void outputFPS() {
-        printf("\x1b[d");
-        printf("\x1b[2J");
-        currTime = glfwGetTime();
-        timeDiff = currTime - prevTime;
-        counter++;
-        if (timeDiff >= 1.0 / 30.0) {
-            double FPS = (1.0 / timeDiff) * counter;
-            cout << "FPS: " << FPS << endl;
-            prevTime = currTime;
-            counter = 0;
-        }
-    };
-};
-
-struct GLContext {
-    GLFWwindow* window;
-    GLFWmonitor* monitor;
-    const GLFWvidmode* mode;
-    GLContext() {}
-};
 
 int main(void)
 {
-    GLFWwindow* window;
-
-    // Initialize the library
-    if (!glfwInit())
-        return -1;
-
-    unsigned int samples = 32;
-
-    glfwWindowHint(GLFW_SAMPLES, samples);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_DOUBLEBUFFER, GL_TRUE);
-
-    // initiliaze monitor/window/mode
-    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-    if (!monitor) {
-        std::cerr << "Failed to get primary monitor!" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-
-    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-    if (!mode) {
-        std::cerr << "Failed to get video mode!" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-
-    glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-
-    window = glfwCreateWindow(mode->width, mode->height, "OpenGL Window", monitor, NULL);
-    if (!window) {
-        glfwTerminate();
-        return -1;
-    }
-    glfwMakeContextCurrent(window);
-    glViewport(0, 0, mode->width, mode->height);
-
-    // initilize GLEW
-    if (glewInit() != GLEW_OK) {
-        std::cerr << "Failed to initialize GLEW!" << std::endl;
-        return -1;
-    }
+    GLContext glContext;
 
     // initialize meshes/camera/shaders/scene/lights
     float scale = 10.0f;
 
-    Camera camera(window, mode->width, mode->height, glm::vec3(4.0f, 0.0f, 0.0f), 60.0f, 1.0f, 5000.0f);
+    Camera camera(glContext.window, glContext.mode->width, glContext.mode->height, glm::vec3(4.0f, 0.0f, 0.0f), 60.0f, 1.0f, 5000.0f);
 
-    Scene scene(window, mode, &camera);
+    Scene scene(&glContext, &camera);
 
     Shader shader("default.vert", "default.frag");
     Shader faceShader("face.vert", "face.frag");
@@ -169,13 +71,9 @@ int main(void)
 
     glfwSwapInterval(1);
 
-    FPSCounter fpsCounter;
-
-    while (!glfwWindowShouldClose(window))
+    while (glContext.isWindowOpen())
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        fpsCounter.outputFPS();
 
 		// timeValue = glfwGetTime();
 		// lightPos = 10.0f * glm::vec3(sin(timeValue), 0.5f * sin(8.0f * timeValue), cos(timeValue));
@@ -183,7 +81,7 @@ int main(void)
 
         scene.Render();
 
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(glContext.window);
         glfwPollEvents();
     }
 	shader.Delete();

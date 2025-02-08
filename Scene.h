@@ -14,6 +14,7 @@
 #include "block.h"
 #include "skybox.h"
 #include "Wireframe.h"
+#include "GLContext.h"
 
 struct Scene {
     std::set<Mesh*> meshes;
@@ -23,8 +24,9 @@ struct Scene {
     Camera* sceneCam;
     Skybox skybox;
     WireframeToggler wireframetoggler;
+    GLContext* glContext;
 
-    Scene(GLFWwindow* window, const GLFWvidmode* mode, Camera* camera);
+    Scene(struct GLContext* GLContext, Camera* camera);
 
     void addObject(Mesh& mesh);
     void addBlock(Block& block);
