@@ -54,7 +54,7 @@ GLContext::GLContext() : window(nullptr), monitor(nullptr), mode(nullptr) {
     // glCullFace(GL_FRONT);      // Cull back faces (default)
     // glFrontFace(GL_CCW);      // Define front faces as counterclockwise (CCW)
 
-    glfwSwapInterval(1);
+    glfwSwapInterval(0);
 }
 
 GLContext::~GLContext() {
