@@ -6,15 +6,6 @@ GLContext::GLContext() : window(nullptr), monitor(nullptr), mode(nullptr) {
         std::cerr << "Failed to initialize GLFW!" << std::endl;
         return;
     }
-
-    // Set GLFW window hints
-    unsigned int samples = 32;
-    glfwWindowHint(GLFW_SAMPLES, samples);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_DOUBLEBUFFER, GL_TRUE);
-
     // Initialize monitor and mode
     monitor = glfwGetPrimaryMonitor();
     if (!monitor) {
@@ -22,17 +13,12 @@ GLContext::GLContext() : window(nullptr), monitor(nullptr), mode(nullptr) {
         glfwTerminate();
         return;
     }
-
     mode = glfwGetVideoMode(monitor);
     if (!mode) {
         std::cerr << "Failed to get video mode!" << std::endl;
         glfwTerminate();
         return;
     }
-
-    // Set the refresh rate to the monitor's refresh rate
-    glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-
     // Create the GLFW window
     window = glfwCreateWindow(mode->width, mode->height, "OpenGL Window", monitor, NULL);
     if (!window) {
@@ -40,8 +26,18 @@ GLContext::GLContext() : window(nullptr), monitor(nullptr), mode(nullptr) {
         glfwTerminate();
         return;
     }
+
     glfwMakeContextCurrent(window);
     glViewport(0, 0, mode->width, mode->height);
+    // Set GLFW window hints
+    unsigned int samples = 32;
+    glfwWindowHint(GLFW_SAMPLES, samples);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_DOUBLEBUFFER, GL_TRUE);
+    glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+    glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
     // Initialize GLEW
     if (glewInit() != GLEW_OK) {
@@ -57,12 +53,6 @@ GLContext::GLContext() : window(nullptr), monitor(nullptr), mode(nullptr) {
     // glEnable(GL_CULL_FACE);  // Enable face culling
     // glCullFace(GL_FRONT);      // Cull back faces (default)
     // glFrontFace(GL_CCW);      // Define front faces as counterclockwise (CCW)
-
-    typedef void (*GLSwapIntervalFunc)(int);
-    GLSwapIntervalFunc wglSwapIntervalEXT = (GLSwapIntervalFunc)glfwGetProcAddress("wglSwapIntervalEXT");
-    if (wglSwapIntervalEXT) {
-        wglSwapIntervalEXT(1);
-    }
 
     glfwSwapInterval(1);
 }

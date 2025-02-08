@@ -150,7 +150,7 @@ void Camera::Inputs()
 		if (firstClick)
 		{
 			// Set the cursor position to the center of the screen only once
-			glfwSetCursorPos(glContext->window, width / 2, height / 2);
+			glfwSetCursorPos(glContext->window, (float)width / 2.0f, (float)height / 2.0f);
 			firstClick = false;
 		}
 		
@@ -176,7 +176,7 @@ void Camera::Inputs()
 		lastY = mouseY;
 
 		// Reset cursor position to center for the next frame
-		glfwSetCursorPos(glContext->window, (width / 2), (height / 2));
+		glfwSetCursorPos(glContext->window, (float)width / 2.0f, (float)height / 2.0f);
 	}
 	else if (glfwGetMouseButton(glContext->window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
 	{

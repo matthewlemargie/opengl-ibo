@@ -17,8 +17,8 @@ Scene::Scene(struct GLContext* GLContext)
     glm::mat4 transform;
     std::vector<glm::mat4> transforms;
     transforms.clear();
-    for (int i = 0; i < 5000; ++i) {
-        transform = glm::translate(glm::mat4(1.0f), 500.0f * glm::vec3(generateFromNormal(), generateFromNormal(), generateFromNormal()));
+    for (int i = 0; i < 10000; ++i) {
+        transform = glm::translate(glm::mat4(1.0f), 750.0f * glm::vec3(generateFromNormal(), generateFromNormal(), generateFromNormal()));
         transforms.emplace_back(transform);
     }
     addBlock(*block);
