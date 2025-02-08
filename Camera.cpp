@@ -1,26 +1,43 @@
 #include"Camera.h"
 
 Camera::Camera(GLContext* glContext, glm::vec3 position, float FOVdeg, float nearPlane, float farPlane)
-: glContext(glContext)
+: glContext(glContext), width(glContext->mode->width), height(glContext->mode->height),Position(position), initialPosition(position),
+FOVdeg(FOVdeg), nearPlane(nearPlane), farPlane(farPlane), mouseX(0.0f), mouseY(0.0f), frustumShader("ray.vert", "ray.frag")
 {
-	Camera::width = glContext->mode->width;
-	Camera::height = glContext->mode->height;
-	Camera::Position = position;
-	Camera::initialPosition = position;
-	Camera::mouseX = 0.0f;
-	Camera::mouseY = 0.0f;
-	Camera::FOVdeg = FOVdeg;
-	Camera::nearPlane = nearPlane;
-	Camera::farPlane = farPlane;
 
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
+	hNear = this->nearPlane * tan(glm::radians(this->FOVdeg / 2.0f));
+	wNear = hNear * ((float)width / height);
+	hFar = this->farPlane * tan(glm::radians(this->FOVdeg / 2.0f));
+	wFar = hFar * ((float)width / height);
 
+    GLfloat vertices[] = {
+        // Near Plane
+        -wNear,  hNear, -this->nearPlane,  wNear,  hNear, -this->nearPlane,
+         wNear,  hNear, -this->nearPlane,  wNear, -hNear, -this->nearPlane,
+         wNear, -hNear, -this->nearPlane, -wNear, -hNear, -this->nearPlane,
+        -wNear, -hNear, -this->nearPlane, -wNear,  hNear, -this->nearPlane,
+
+        // Far Plane
+        -wFar,  hFar, -this->farPlane,  wFar,  hFar, -this->farPlane,
+         wFar,  hFar, -this->farPlane,  wFar, -hFar, -this->farPlane,
+         wFar, -hFar, -this->farPlane, -wFar, -hFar, -this->farPlane,
+        -wFar, -hFar, -this->farPlane, -wFar,  hFar, -this->farPlane,
+
+        // Connect Near and Far Planes
+        -wNear,  hNear, -this->nearPlane,  -wFar,   hFar,  -this->farPlane,
+         wNear,  hNear, -this->nearPlane,   wFar,   hFar,  -this->farPlane,
+         wNear, -hNear, -this->nearPlane,   wFar,  -hFar,  -this->farPlane,
+        -wNear, -hNear, -this->nearPlane,  -wFar,  -hFar,  -this->farPlane
+    };
+
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, 72 * sizeof(GLfloat), nullptr, GL_STATIC_DRAW); // Allocate space
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)0);
     glEnableVertexAttribArray(0);
+
 }
 
 void Camera::updateMatrix()
@@ -30,7 +47,6 @@ void Camera::updateMatrix()
 	float Height = height;
 	float aspectRatio = Width / Height;
 	projection = glm::perspective(glm::radians(FOVdeg), aspectRatio, nearPlane, farPlane);
-
 	cameraMatrix = projection * view;
 }
 
@@ -39,67 +55,17 @@ void Camera::Matrix(Shader& shader, const char* uniform)
 	glUniformMatrix4fv(glGetUniformLocation(shader.ID, uniform), 1, GL_FALSE, glm::value_ptr(cameraMatrix));
 }
 
-void Camera::drawFrustum(Shader rayShader, glm::mat4 proj, glm::mat4 vw) {
-	hNear = nearPlane * tan(glm::radians(FOVdeg / 2.0f));
-	wNear = hNear * ((float)width / height);
-	hFar = farPlane * tan(glm::radians(FOVdeg / 2.0f));
-	wFar = hFar * ((float)width / height);
-
-	GLfloat vertices[] = {
-		// Near Plane
-		-wNear,  hNear, -nearPlane,
-		 wNear,  hNear, -nearPlane,
-
-		 wNear,  hNear, -nearPlane,
-		 wNear, -hNear, -nearPlane,
-
-		 wNear, -hNear, -nearPlane,
-		-wNear, -hNear, -nearPlane,
-
-		-wNear, -hNear, -nearPlane,
-		-wNear,  hNear, -nearPlane,
-
-		// Far Plane
-		-wFar,  hFar, -farPlane,
-		 wFar,  hFar, -farPlane,
-
-		 wFar,  hFar, -farPlane,
-		 wFar, -hFar, -farPlane,
-
-		 wFar, -hFar, -farPlane,
-		-wFar, -hFar, -farPlane,
-
-		-wFar, -hFar, -farPlane,
-		-wFar,  hFar, -farPlane,
-
-		// Connect Near and Far Planes
-		-wNear,  hNear, -nearPlane,
-		-wFar,   hFar,  -farPlane,
-
-		 wNear,  hNear, -nearPlane,
-		 wFar,   hFar,  -farPlane,
-
-		 wNear, -hNear, -nearPlane,
-		 wFar,  -hFar,  -farPlane,
-
-		-wNear, -hNear, -nearPlane,
-		-wFar,  -hFar,  -farPlane,
-	};
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), &vertices);
-	rayShader.Activate();
-	glm::mat4 camMat = proj * vw;
-	glUniformMatrix4fv(glGetUniformLocation(rayShader.ID, "camMatrix"), 1, GL_FALSE, glm::value_ptr(camMat));
-
-	// Pass the inverseView matrix to the shader
+void Camera::drawFrustumFromCamera(Camera& camera) {
+	frustumShader.Activate();
+	glUniformMatrix4fv(glGetUniformLocation(frustumShader.ID, "camMatrix"), 1, GL_FALSE, glm::value_ptr(camera.cameraMatrix));
 	glm::mat4 inverseView = glm::inverse(view);
-	glUniformMatrix4fv(glGetUniformLocation(rayShader.ID, "inverseView"), 1, GL_FALSE, glm::value_ptr(inverseView));
+	glUniformMatrix4fv(glGetUniformLocation(frustumShader.ID, "inverseView"), 1, GL_FALSE, glm::value_ptr(inverseView));
 
 	// Draw the frustum
 	glBindVertexArray(VAO);
 	glLineWidth(1.0f);
 	glDrawArrays(GL_LINES, 0, 24);
+	glBindVertexArray(0);
 }
 
 void Camera::Inputs()

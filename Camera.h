@@ -30,13 +30,21 @@ struct Camera
 
 	float FOVdeg, nearPlane, farPlane;
 
-	float hNear, hFar, wNear, wFar;
+	float hNear = 1.0f;
+	float hFar = 1.0f;
+	float wNear= 1.0f;
+	float wFar = 1.0f;
 
 	bool firstClick = true;
 
-	double mouseX, mouseY;
+	double mouseX = 1.0f;
+    double mouseY = 1.0f;
+
+	GLfloat vertices[72];
 
 	GLuint VAO, VBO;
+
+    Shader frustumShader;
 
 	float rayLength = 30.0f;
 
@@ -51,7 +59,7 @@ struct Camera
 	void updateMatrix();
 	void Matrix(Shader& shader, const char* uniform);
 	void Inputs();
-	void drawFrustum(Shader rayShader, glm::mat4 proj, glm::mat4 vw);
+    void drawFrustumFromCamera(Camera& camera);
 };
 
 #endif // !CAMERA_CLASS_H

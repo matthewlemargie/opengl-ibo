@@ -21,48 +21,63 @@ Skybox::Skybox()
 
     // std::string parentDir = (filesystem::current_path().filesystem::path::parent_path()).string();
     std::string parentDir = "/home/dmac/Documents/projects2025/opengl-ibo";
+    std::string spaceboxDir = "/assets/skyboxes/spacebox";
+    std::string skyboxDir = "/assets/skyboxes/cloudy/blue";
 	// All the faces of the cubemap (make sure they are in this exact order)
 	std::string facesCubemap[6] =
 	{
-        parentDir + "/assets/skyboxes/cloudy/blue/left.jpg",
-        parentDir + "/assets/skyboxes/cloudy/blue/right.jpg",
-        parentDir + "/assets/skyboxes/cloudy/blue/downflop.jpg",
-        parentDir + "/assets/skyboxes/cloudy/blue/upflop.jpg",
-        parentDir + "/assets/skyboxes/cloudy/blue/front.jpg",
-        parentDir + "/assets/skyboxes/cloudy/blue/back.jpg",
+        parentDir + skyboxDir + "/right.png",
+        parentDir + skyboxDir + "/left.png",
+        parentDir + skyboxDir + "/up.png",
+        parentDir + skyboxDir + "/down.png",
+        parentDir + skyboxDir + "/front.png",
+        parentDir + skyboxDir + "/back.png",
+	};
+
+	std::string spaceboxImages[6] =
+	{
+        parentDir + spaceboxDir + "/right.png",
+        parentDir + spaceboxDir + "/left.png",
+        parentDir + spaceboxDir + "/top.png",
+        parentDir + spaceboxDir + "/bottom.png",
+        parentDir + spaceboxDir + "/front.png",
+        parentDir + spaceboxDir + "/back.png",
 	};
 
 	// Creates the cubemap texture object
 	glGenTextures(1, &cubemapTexture);
+    glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-    glActiveTexture(GL_TEXTURE0);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	// These are very important to prevent seams
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    	// This might help with seams on some systems
-	//glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+    // This might help with seams on some systems
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 	// Cycles through all the textures and attaches them to the cubemap object
 	for (unsigned int i = 0; i < 6; i++)
 	{
 		int width, height, nrChannels;
-		unsigned char* data = stbi_load(facesCubemap[i].c_str(), &width, &height, &nrChannels, 0);
+		unsigned char* data = stbi_load(spaceboxImages[i].c_str(), &width, &height, &nrChannels, 0);
 		if (data)
 		{
-            stbi_set_flip_vertically_on_load(true);
-            // stbi_set_flip_vertically_on_load(false);
+            if (i == 5)
+                stbi_set_flip_vertically_on_load(true);
+            else
+                stbi_set_flip_vertically_on_load(false);
+
 			glTexImage2D
 			(
 				GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
 				0,
-				GL_RGB,
+				nrChannels == 4 ? GL_RGBA : GL_RGB,
 				width,
 				height,
 				0,
-				GL_RGB,
+				nrChannels == 4 ? GL_RGBA : GL_RGB,
 				GL_UNSIGNED_BYTE,
 				data
 			);
@@ -75,7 +90,7 @@ Skybox::Skybox()
 		}
 	}
 
-	// glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
 void Skybox::Draw(Camera* camera) {
@@ -91,8 +106,9 @@ void Skybox::Draw(Camera* camera) {
     // Draws the cubemap as the last object so we can save a bit of performance by discarding all fragments
     // where an object is present (a depth of 1.0f will always fail against any object's depth value)
     glBindVertexArray(skyboxVAO);
-    glActiveTexture(GL_TEXTURE0);
+    glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+    glUniform1i(glGetUniformLocation(skyboxShader->ID, "skybox"), 1);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
