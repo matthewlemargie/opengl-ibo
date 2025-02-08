@@ -1,6 +1,6 @@
 #include "Scene.h"
 
-Scene::Scene(GLFWwindow* window, const GLFWvidmode* mode, Camera* camera) : sceneWindow(window), sceneMode(mode), sceneCam(camera) {}
+Scene::Scene(GLFWwindow* window, const GLFWvidmode* mode, Camera* camera) : sceneWindow(window), sceneMode(mode), sceneCam(camera), skybox(*camera) {}
 
 void Scene::addObject(Mesh& mesh) {
     Mesh* meshPtr = &mesh;
@@ -13,6 +13,7 @@ void Scene::addBlock(Block& block) {
 }
 
 void Scene::Render() {
+    skybox.Draw();
     for (auto& mesh : meshes) {
         deleteMeshInstanceByRay(*mesh, sceneWindow, sceneMode, sceneCam);
         mesh->Draw(*sceneCam);

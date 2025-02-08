@@ -121,7 +121,6 @@ int main(void)
     float scale = 10.0f;
 
     Camera camera(mode->width, mode->height, glm::vec3(4.0f, 0.0f, 0.0f), 60.0f, 1.0f, 5000.0f);
-    Skybox skybox(camera);
 
     Scene scene(window, mode, &camera);
 
@@ -188,7 +187,6 @@ int main(void)
         camera.Inputs(window);
         camera.updateMatrix();
 
-        skybox.Draw();
         scene.Render();
 
         glfwSwapBuffers(window);
