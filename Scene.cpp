@@ -36,8 +36,6 @@ void Scene::addBlock(Block& block) {
 }
 
 void Scene::Render(Camera* camera) {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     timeValue = glfwGetTime();
     lightPos = 10.0f * glm::vec3(sin(timeValue), 0.5f * sin(8.0f * timeValue), cos(timeValue));
     scale = 10.0f + abs(cos(2.0f * timeValue));
@@ -45,9 +43,10 @@ void Scene::Render(Camera* camera) {
     camera->Inputs();
     camera->updateMatrix();
 
+    wireframetoggler.toggleWireframe();
+
     skybox.Draw(camera);
 
-    wireframetoggler.toggleWireframe();
     for (auto& mesh : meshes) {
         mesh->shader->Activate();
         glUniform1f(glGetUniformLocation(mesh->shader->ID, "scale"), *mesh->scale);

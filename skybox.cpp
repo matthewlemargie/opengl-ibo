@@ -80,7 +80,8 @@ Skybox::Skybox()
 
 void Skybox::Draw(Camera* camera) {
     // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    glDepthFunc(GL_LEQUAL);
+    // glDepthFunc(GL_LEQUAL);
+    glDepthMask(GL_FALSE);
     skyboxShader->Activate();
     glm::mat4 view = glm::mat4(glm::mat3(glm::lookAt(camera->Position, camera->Position + camera->Orientation, camera->Up)));
     glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)1920 / 1080, 0.1f, 10000.0f);
@@ -89,15 +90,14 @@ void Skybox::Draw(Camera* camera) {
 
     // Draws the cubemap as the last object so we can save a bit of performance by discarding all fragments
     // where an object is present (a depth of 1.0f will always fail against any object's depth value)
-    glDepthMask(GL_FALSE);
     glBindVertexArray(skyboxVAO);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
-    glDepthMask(GL_TRUE);
 
     // Switch back to the normal depth function
-    glDepthFunc(GL_LESS);
+    glDepthMask(GL_TRUE);
+    // glDepthFunc(GL_LESS);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
