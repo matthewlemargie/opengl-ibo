@@ -13,10 +13,11 @@
 #include "shaderClass.h"
 #include "VAO.h"
 #include "VBO.h"
+#include "GLContext.h"
 
 struct Camera
 {
-    GLFWwindow* window;
+    GLContext* glContext;
 
 	glm::vec3 Position;
 	glm::vec3 initialPosition;
@@ -45,7 +46,7 @@ struct Camera
 	float speed = 3.0f;
 	float sensitivity = 100.0f;
 
-	Camera(GLFWwindow* window, int width, int height, glm::vec3 position, float FOVdeg, float nearPlane, float farPlane);
+	Camera(GLContext* glContext, glm::vec3 position, float FOVdeg, float nearPlane, float farPlane);
 
 	void updateMatrix();
 	void Matrix(Shader& shader, const char* uniform);

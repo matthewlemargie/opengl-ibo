@@ -57,6 +57,14 @@ void Mesh::addInstance(std::vector<glm::mat4> instanceMats) {
     vao.Unbind();
 }
 
+void Mesh::addInstance(glm::mat4 instanceMat) {
+    vao.Bind();
+    ibo.Bind();
+    ibo.addInstance(instanceMat, modelAABB);
+    ibo.Unbind();
+    vao.Unbind();
+}
+
 void Mesh::Draw(Camera& camera)
 {
 	vao.Bind();

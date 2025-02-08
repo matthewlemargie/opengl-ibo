@@ -21,7 +21,9 @@ struct IBO
 	IBO();
 
     void addInstance(std::vector<glm::mat4>& instanceMats, AABB modelAABB);
+    void addInstance(glm::mat4& instanceMat, AABB modelAABB);
     void addInstance(std::vector<glm::mat4>& instanceMats);
+    void addInstance(glm::mat4& instanceMat);
     void deleteInstance(int idx);
     void updateBuffer();
 	void Bind();

@@ -6,6 +6,7 @@
 #include "Camera.h"
 #include "Mesh.h"
 #include "block.h"
+#include "GLContext.h"
 
 glm::vec3 calculateRayWorld(GLFWwindow* window, const Camera* camera, const GLFWvidmode* mode);
 glm::vec3 calculateRayWorldFromNDC(float xNDC, float yNDC, Camera camera);
@@ -16,9 +17,11 @@ void deleteBlockInstanceByRay(Block& block, GLFWwindow* window, const GLFWvidmod
 struct Ray {
     GLuint VAO = 0;
     GLuint VBO;
+    Shader rayShader;
+    Ray();
 
     void createRayLine(glm::vec3 rayWorld, const Camera* camera);
-    void drawRay(GLFWwindow* window, Camera* camera, const GLFWvidmode* mode, Shader* shader);
+    void drawRay(GLContext* glContext, Camera* camera);
     void resetRay();
 };
 

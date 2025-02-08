@@ -72,6 +72,8 @@ void deleteBlockInstanceByRay(Block& block, GLFWwindow* window, const GLFWvidmod
     }
 }
 
+Ray::Ray() : rayShader("ray.vert", "ray.frag") {}
+
 void Ray::createRayLine(glm::vec3 rayWorld, const Camera* camera) {
     glm::vec3 lineVertices[] = {
         camera->Position,
@@ -95,17 +97,17 @@ void Ray::createRayLine(glm::vec3 rayWorld, const Camera* camera) {
     glBindVertexArray(0);
 }
 
-void Ray::drawRay(GLFWwindow* window, Camera* camera, const GLFWvidmode* mode, Shader* shader) {
-    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+void Ray::drawRay(GLContext* glContext, Camera* camera) {
+    if (glfwGetKey(glContext->window, GLFW_KEY_R) == GLFW_PRESS)
         resetRay();
 
-    if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) {
-        glm::vec3 rayWorld = calculateRayWorld(window, camera, mode);
+    if (glfwGetKey(glContext->window, GLFW_KEY_G) == GLFW_PRESS) {
+        glm::vec3 rayWorld = calculateRayWorld(glContext->window, camera, glContext->mode);
         createRayLine(rayWorld, camera);
     }
     if (VAO != 0) {
-        shader->Activate();
-        camera->Matrix(*shader, "camMatrix");
+        rayShader.Activate();
+        camera->Matrix(rayShader, "camMatrix");
         glBindVertexArray(VAO);
         glDrawArrays(GL_LINES, 0, 2);
         glBindVertexArray(0);

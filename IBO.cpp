@@ -27,6 +27,19 @@ void IBO::addInstance(std::vector<glm::mat4>& instanceMats, AABB modelAABB) {
     instances.insert(instances.end(), instanceMats.begin(), instanceMats.end());
 }
 
+void IBO::addInstance(glm::mat4& instanceMat, AABB modelAABB) {
+    glm::vec3 newMin = instanceMat * glm::vec4(modelAABB.min, 1.0f);
+    glm::vec3 newMax = instanceMat * glm::vec4(modelAABB.max, 1.0f);
+    AABB newAABB(newMin, newMax);
+    aabbs.push_back(newAABB);
+
+    glBindBuffer(GL_ARRAY_BUFFER, ID);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * instances.size(), sizeof(glm::mat4), &instanceMat);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    instances.push_back(instanceMat);
+}
+
 void IBO::addInstance(std::vector<glm::mat4>& instanceMats) {
     if (instances.size() + instanceMats.size() > maxInstances) {
         return;
@@ -37,6 +50,14 @@ void IBO::addInstance(std::vector<glm::mat4>& instanceMats) {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     instances.insert(instances.end(), instanceMats.begin(), instanceMats.end());
+}
+
+void IBO::addInstance(glm::mat4& instanceMat) {
+    glBindBuffer(GL_ARRAY_BUFFER, ID);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * instances.size(), sizeof(glm::mat4), &instanceMat);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    instances.push_back(instanceMat);
 }
 
 void IBO::deleteInstance(int idx) {

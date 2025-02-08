@@ -1,7 +1,29 @@
 #include "Scene.h"
 
-Scene::Scene(struct GLContext* GLContext) 
-: glContext(GLContext), wireframetoggler(GLContext->window) {}
+Scene::Scene(struct GLContext* GLContext)
+: glContext(GLContext), wireframetoggler(GLContext->window), shader("default.vert", "default.frag"), lightShader("light.vert", "light.frag") 
+{
+    if (!GLContext) {
+        std::cerr << "Error: GLContext is null!" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    // create simple scene for rendering
+    Mesh* lightCube = new Mesh("box.obj", lightShader, scale);
+    addObject(*lightCube);
+    lightCube->addInstance(glm::mat4(1.0f));
+
+    Block* block = new Block(scale);
+    glm::mat4 transform;
+    std::vector<glm::mat4> transforms;
+    transforms.clear();
+    for (int i = 0; i < 5000; ++i) {
+        transform = glm::translate(glm::mat4(1.0f), 500.0f * glm::vec3(generateFromNormal(), generateFromNormal(), generateFromNormal()));
+        transforms.emplace_back(transform);
+    }
+    addBlock(*block);
+    block->addInstance(transforms);
+}
 
 void Scene::addObject(Mesh& mesh) {
     Mesh* meshPtr = &mesh;
@@ -46,3 +68,12 @@ void Scene::Render(Camera* camera) {
         block->drawCube();
     }
 }
+
+// Mesh* box = new Mesh("box.obj", shader, scale);
+// glm::mat4 transform = glm::mat4(1.0f);
+// for (int i = 0; i < 1000; ++i) {
+    // transform = glm::translate(glm::mat4(1.0f), 500.0f * glm::vec3(generateFromNormal(), generateFromNormal(), generateFromNormal()));
+    // transforms.emplace_back(transform);
+// }
+// addObject(*box);
+// box->addInstance(transforms);

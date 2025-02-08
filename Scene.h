@@ -17,6 +17,7 @@
 #include "skybox.h"
 #include "Wireframe.h"
 #include "GLContext.h"
+#include "GenerateRandoms.h"
 
 struct Scene {
     std::set<Mesh*> meshes;
@@ -25,12 +26,15 @@ struct Scene {
     glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
     glm::vec4 lightColor = glm::vec4(0.5f, 0.7f, 0.4f, 1.0f);
 
-    float timeValue = glfwGetTime();
+    float timeValue;
     float scale = 10.0f;
 
     Skybox skybox;
     WireframeToggler wireframetoggler;
     GLContext* glContext;
+
+    Shader shader;
+    Shader lightShader;
 
     Scene(struct GLContext* GLContext);
 

@@ -1,10 +1,10 @@
 #include"Camera.h"
 
-Camera::Camera(GLFWwindow* window, int width, int height, glm::vec3 position, float FOVdeg, float nearPlane, float farPlane)
-: window(window)
+Camera::Camera(GLContext* glContext, glm::vec3 position, float FOVdeg, float nearPlane, float farPlane)
+: glContext(glContext)
 {
-	Camera::width = width;
-	Camera::height = height;
+	Camera::width = glContext->mode->width;
+	Camera::height = glContext->mode->height;
 	Camera::Position = position;
 	Camera::initialPosition = position;
 	Camera::mouseX = 0.0f;
@@ -104,58 +104,58 @@ void Camera::drawFrustum(Shader rayShader, glm::mat4 proj, glm::mat4 vw) {
 
 void Camera::Inputs()
 {
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	if (glfwGetKey(glContext->window, GLFW_KEY_W) == GLFW_PRESS)
 	{
 		Position += speed * Orientation;
 	}
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	if (glfwGetKey(glContext->window, GLFW_KEY_A) == GLFW_PRESS)
 	{
 		Position += speed * -glm::normalize(glm::cross(Orientation, Up));
 	}
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+	if (glfwGetKey(glContext->window, GLFW_KEY_S) == GLFW_PRESS)
 	{
 		Position += speed * -Orientation;
 	}
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	if (glfwGetKey(glContext->window, GLFW_KEY_D) == GLFW_PRESS)
 	{
 		Position += speed * glm::normalize(glm::cross(Orientation, Up));
 	}
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+	if (glfwGetKey(glContext->window, GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
 		Position += speed * Up;
 	}
-	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+	if (glfwGetKey(glContext->window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
 	{
 		Position += speed * -Up;
 	}
-	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
+	if (glfwGetKey(glContext->window, GLFW_KEY_O) == GLFW_PRESS)
 	{
 		Position = initialPosition;
 		Orientation = initialOrientation;
 	}
-	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+	if (glfwGetKey(glContext->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 	{
 		speed = 5.0f;
 	}
-	else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
+	else if (glfwGetKey(glContext->window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
 	{
 		speed = 3.0f;
 	}
 	double lastX = width / 2.0, lastY = height / 2.0;
 
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+	if (glfwGetMouseButton(glContext->window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 	{
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		glfwSetInputMode(glContext->window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
 		if (firstClick)
 		{
 			// Set the cursor position to the center of the screen only once
-			glfwSetCursorPos(window, width / 2, height / 2);
+			glfwSetCursorPos(glContext->window, width / 2, height / 2);
 			firstClick = false;
 		}
 		
 		// Get the current mouse position
-		glfwGetCursorPos(window, &mouseX, &mouseY);
+		glfwGetCursorPos(glContext->window, &mouseX, &mouseY);
 
 		// Calculate the difference in mouse movement since the last frame
 		float rotX = sensitivity * (float)(mouseY - lastY) / height;
@@ -176,11 +176,11 @@ void Camera::Inputs()
 		lastY = mouseY;
 
 		// Reset cursor position to center for the next frame
-		glfwSetCursorPos(window, (width / 2), (height / 2));
+		glfwSetCursorPos(glContext->window, (width / 2), (height / 2));
 	}
-	else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
+	else if (glfwGetMouseButton(glContext->window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
 	{
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		glfwSetInputMode(glContext->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		firstClick = true;
 	}
 }
