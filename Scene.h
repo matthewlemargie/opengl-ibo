@@ -13,6 +13,7 @@
 #include "calculateRays.h"
 #include "block.h"
 #include "skybox.h"
+#include "Wireframe.h"
 
 struct Scene {
     std::set<Mesh*> meshes;
@@ -21,6 +22,7 @@ struct Scene {
     const GLFWvidmode* sceneMode;
     Camera* sceneCam;
     Skybox skybox;
+    WireframeToggler wireframetoggler;
 
     Scene(GLFWwindow* window, const GLFWvidmode* mode, Camera* camera);
 

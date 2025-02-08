@@ -1,6 +1,7 @@
 #include"Camera.h"
 
-Camera::Camera(int width, int height, glm::vec3 position, float FOVdeg, float nearPlane, float farPlane)
+Camera::Camera(GLFWwindow* window, int width, int height, glm::vec3 position, float FOVdeg, float nearPlane, float farPlane)
+: window(window)
 {
 	Camera::width = width;
 	Camera::height = height;
@@ -101,7 +102,7 @@ void Camera::drawFrustum(Shader rayShader, glm::mat4 proj, glm::mat4 vw) {
 	glDrawArrays(GL_LINES, 0, 24);
 }
 
-void Camera::Inputs(GLFWwindow* window)
+void Camera::Inputs()
 {
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{

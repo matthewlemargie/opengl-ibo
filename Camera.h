@@ -16,6 +16,8 @@
 
 struct Camera
 {
+    GLFWwindow* window;
+
 	glm::vec3 Position;
 	glm::vec3 initialPosition;
 	glm::vec3 Orientation = glm::vec3(-1.0f, 0.0f, 0.0f);
@@ -43,11 +45,11 @@ struct Camera
 	float speed = 3.0f;
 	float sensitivity = 100.0f;
 
-	Camera(int width, int height, glm::vec3 position, float FOVdeg, float nearPlane, float farPlane);
+	Camera(GLFWwindow* window, int width, int height, glm::vec3 position, float FOVdeg, float nearPlane, float farPlane);
 
 	void updateMatrix();
 	void Matrix(Shader& shader, const char* uniform);
-	void Inputs(GLFWwindow*);
+	void Inputs();
 	void drawFrustum(Shader rayShader, glm::mat4 proj, glm::mat4 vw);
 };
 

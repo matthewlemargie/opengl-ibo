@@ -1,6 +1,7 @@
 #include "Scene.h"
 
-Scene::Scene(GLFWwindow* window, const GLFWvidmode* mode, Camera* camera) : sceneWindow(window), sceneMode(mode), sceneCam(camera), skybox(*camera) {}
+Scene::Scene(GLFWwindow* window, const GLFWvidmode* mode, Camera* camera) 
+: sceneWindow(window), sceneMode(mode), sceneCam(camera), skybox(*camera), wireframetoggler(window) {}
 
 void Scene::addObject(Mesh& mesh) {
     Mesh* meshPtr = &mesh;
@@ -13,7 +14,10 @@ void Scene::addBlock(Block& block) {
 }
 
 void Scene::Render() {
+    sceneCam->Inputs();
+    sceneCam->updateMatrix();
     skybox.Draw();
+    wireframetoggler.toggleWireframe();
     for (auto& mesh : meshes) {
         deleteMeshInstanceByRay(*mesh, sceneWindow, sceneMode, sceneCam);
         mesh->Draw(*sceneCam);

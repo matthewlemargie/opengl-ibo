@@ -80,6 +80,7 @@ Skybox::Skybox(Camera& camera)
 }
 
 void Skybox::Draw() {
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glDepthFunc(GL_LEQUAL);
     skyboxShader->Activate();
     glm::mat4 view = glm::mat4(1.0f);
@@ -103,4 +104,5 @@ void Skybox::Draw() {
 
     // Switch back to the normal depth function
     glDepthFunc(GL_LESS);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }

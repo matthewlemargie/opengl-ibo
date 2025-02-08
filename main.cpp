@@ -8,7 +8,6 @@
 #include <random>
 
 #include "VBO.h"
-#include "Wireframe.h"
 #include "calculateRays.h"
 #include "ModelLoader.h"
 #include "Mesh.h"
@@ -120,7 +119,7 @@ int main(void)
     // initialize meshes/camera/shaders/scene/lights
     float scale = 10.0f;
 
-    Camera camera(mode->width, mode->height, glm::vec3(4.0f, 0.0f, 0.0f), 60.0f, 1.0f, 5000.0f);
+    Camera camera(window, mode->width, mode->height, glm::vec3(4.0f, 0.0f, 0.0f), 60.0f, 1.0f, 5000.0f);
 
     Scene scene(window, mode, &camera);
 
@@ -170,22 +169,17 @@ int main(void)
 
     glfwSwapInterval(1);
 
-    WireframeToggler wireframetoggler(window);
     FPSCounter fpsCounter;
 
     while (!glfwWindowShouldClose(window))
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // fpsCounter.outputFPS();
-        wireframetoggler.toggleWireframe(window);
+        fpsCounter.outputFPS();
 
-		timeValue = glfwGetTime();
-		lightPos = 10.0f * glm::vec3(sin(timeValue), 0.5f * sin(8.0f * timeValue), cos(timeValue));
-        scale = 10.0f + abs(cos(2.0f * timeValue));
-
-        camera.Inputs(window);
-        camera.updateMatrix();
+		// timeValue = glfwGetTime();
+		// lightPos = 10.0f * glm::vec3(sin(timeValue), 0.5f * sin(8.0f * timeValue), cos(timeValue));
+        // scale = 10.0f + abs(cos(2.0f * timeValue));
 
         scene.Render();
 

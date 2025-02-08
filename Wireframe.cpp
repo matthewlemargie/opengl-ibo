@@ -3,9 +3,9 @@
 #include <GL/gl.h>
 
 WireframeToggler::WireframeToggler(GLFWwindow* window)
-    : wireframeMode(false), keyPressedLastFrame(false) {}
+    : window(window), wireframeMode(false), keyPressedLastFrame(false) {}
 
-void WireframeToggler::toggleWireframe(GLFWwindow* window) {
+void WireframeToggler::toggleWireframe() {
     if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) {
         if (!keyPressedLastFrame) {
             if (!wireframeMode) {
