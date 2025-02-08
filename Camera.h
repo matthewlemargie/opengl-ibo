@@ -24,35 +24,34 @@ struct Camera
 	glm::vec3 Orientation = glm::vec3(-1.0f, 0.0f, 0.0f);
 	glm::vec3 initialOrientation = glm::vec3(-1.0f, 0.0f, 0.0f);
 	glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
+
 	glm::mat4 cameraMatrix = glm::mat4(1.0f);
 	glm::mat4 view = glm::mat4(1.0f);
 	glm::mat4 projection = glm::mat4(1.0f);
 
 	float FOVdeg, nearPlane, farPlane;
-
 	float hNear = 1.0f;
 	float hFar = 1.0f;
 	float wNear= 1.0f;
 	float wFar = 1.0f;
+	float normalSpeed = 3.0f * (float)(60.0 / glContext->mode->refreshRate);
+	float fastSpeed = 2.0f * normalSpeed;
+    float speed;
+	float sensitivity = 100.0f;
+
+    int width;
+    int height;
+
+    double mouseX = 1.0f;
+    double mouseY = 1.0f;
 
 	bool firstClick = true;
-
-	double mouseX = 1.0f;
-    double mouseY = 1.0f;
 
 	GLfloat vertices[72];
 
 	GLuint VAO, VBO;
 
     Shader frustumShader;
-
-	float rayLength = 30.0f;
-
-	int width;
-	int height;
-
-	float speed = 3.0f;
-	float sensitivity = 100.0f;
 
 	Camera(GLContext* glContext, glm::vec3 position, float FOVdeg, float nearPlane, float farPlane);
 

@@ -101,11 +101,11 @@ void Camera::Inputs()
 	}
 	if (glfwGetKey(glContext->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 	{
-		speed = 5.0f;
+		speed = fastSpeed;
 	}
 	else if (glfwGetKey(glContext->window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
 	{
-		speed = 3.0f;
+		speed = normalSpeed;
 	}
 	double lastX = width / 2.0, lastY = height / 2.0;
 

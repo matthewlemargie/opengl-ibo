@@ -9,10 +9,6 @@ Scene::Scene(struct GLContext* GLContext)
     }
 
     // create simple scene for rendering
-    Mesh* lightCube = new Mesh("box.obj", lightShader, scale);
-    addObject(*lightCube);
-    lightCube->addInstance(glm::mat4(1.0f));
-
     Block* block = new Block(scale);
     glm::mat4 transform;
     std::vector<glm::mat4> transforms;
@@ -38,7 +34,7 @@ void Scene::addBlock(Block& block) {
 void Scene::Render(Camera* camera) {
     timeValue = glfwGetTime();
     lightPos = 10.0f * glm::vec3(sin(timeValue), 0.5f * sin(8.0f * timeValue), cos(timeValue));
-    scale = 10.0f + abs(cos(2.0f * timeValue));
+    // scale = 10.0f + abs(cos(2.0f * timeValue));
 
     camera->Inputs();
     camera->updateMatrix();
@@ -67,6 +63,10 @@ void Scene::Render(Camera* camera) {
         block->drawCube();
     }
 }
+
+// Mesh* lightCube = new Mesh("box.obj", lightShader, scale);
+// addObject(*lightCube);
+// lightCube->addInstance(glm::mat4(1.0f));
 
 // Mesh* box = new Mesh("box.obj", shader, scale);
 // glm::mat4 transform = glm::mat4(1.0f);
