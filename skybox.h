@@ -54,8 +54,8 @@ struct Skybox {
     Camera* camera;
     Shader* skyboxShader;
 
-    Skybox(Camera& camera);
-    void Draw();
+    Skybox();
+    void Draw(Camera* camera);
 
 };
 

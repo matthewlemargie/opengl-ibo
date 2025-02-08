@@ -49,6 +49,22 @@ GLContext::GLContext() : window(nullptr), monitor(nullptr), mode(nullptr) {
         glfwTerminate();
         return;
     }
+
+	glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_MULTISAMPLE);
+    glDepthFunc(GL_LESS);
+    // glEnable(GL_CULL_FACE);  // Enable face culling
+    // glCullFace(GL_FRONT);      // Cull back faces (default)
+    // glFrontFace(GL_CCW);      // Define front faces as counterclockwise (CCW)
+
+    typedef void (*GLSwapIntervalFunc)(int);
+    GLSwapIntervalFunc wglSwapIntervalEXT = (GLSwapIntervalFunc)glfwGetProcAddress("wglSwapIntervalEXT");
+    if (wglSwapIntervalEXT) {
+        wglSwapIntervalEXT(1);
+    }
+
+    glfwSwapInterval(1);
 }
 
 GLContext::~GLContext() {

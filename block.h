@@ -83,18 +83,18 @@ struct Block {
 
     AABB modelAABB;
 
-    Block(float& scale, glm::vec4& lightColor, glm::vec3& lightPos);
+    Block(float& scale);
     ~Block();
 
-    void shaderCameraTextureActivate(Camera& camera);
+    void textureActivate(Camera& camera);
     void addInstance(std::vector<glm::mat4> instanceMats);
-    void drawCube(Camera& camera);
-    void drawTop(Camera& camera);
-    void drawBottom(Camera& camera);
-    void drawNorth(Camera& camera);
-    void drawSouth(Camera& camera);
-    void drawEast(Camera& camera);
-    void drawWest(Camera& camera);
+    void drawCube();
+    void drawTop();
+    void drawBottom();
+    void drawNorth();
+    void drawSouth();
+    void drawEast();
+    void drawWest();
 };
 
 #endif

@@ -49,8 +49,8 @@ struct Mesh
 
     int numInstances = 0;
 
-    Mesh(const std::string& model, Shader& shader, float& scale, glm::vec4& lightColor, glm::vec3& lightPos);
-    Mesh(GLfloat* vertices, size_t vertexSize, GLuint* indices, size_t indexSize, Shader& shader, float& scale, glm::vec4& lightColor, glm::vec3& lightPos);
+    Mesh(const std::string& model, Shader& shader, float& scale);
+    Mesh(GLfloat* vertices, size_t vertexSize, GLuint* indices, size_t indexSize, Shader& shader, float& scale);
 
     void addInstance(std::vector<glm::mat4> instanceMats);
     void addFaceInstance(std::vector<glm::mat4> instanceMats);

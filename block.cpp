@@ -1,7 +1,8 @@
 #include "block.h"
 
-Block::Block(float& scale, glm::vec4& lightColor, glm::vec3& lightPos) 
-    : scale(&scale), lightColor(&lightColor), lightPos(&lightPos) {
+Block::Block(float& scale) 
+: scale(&scale) 
+{
     vao.Bind();
     vbo.addVertices(cubeVertices, sizeof(cubeVertices));
     EBO ebo(cubeIndices, sizeof(cubeIndices));
@@ -34,55 +35,43 @@ void Block::addInstance(std::vector<glm::mat4> instanceMats) {
     vao.Unbind();
 }
 
-void Block::shaderCameraTextureActivate(Camera& camera) {
+void Block::textureActivate(Camera& camera) {
     grass->texUnit(*shader, "tex0", 0);
     grass->Bind();
-    shader->Activate();
-    glUniform1f(glGetUniformLocation(shader->ID, "scale"), *scale);
-    glUniform4f(glGetUniformLocation(shader->ID, "lightColor"), lightColor->x, lightColor->y, lightColor->z, lightColor->w);
-    glUniform3f(glGetUniformLocation(shader->ID, "lightPos"), lightPos->x, lightPos->y, lightPos->z);
-    camera.Matrix(*shader, "camMatrix");
 }
 
-void Block::drawCube(Camera& camera) {
-    shaderCameraTextureActivate(camera);
+void Block::drawCube() {
 	vao.Bind();
 	glDrawElementsInstanced(GL_TRIANGLES, sizeof(cubeIndices) / sizeof(GLuint), GL_UNSIGNED_INT, 0, ibo.instances.size());
     vao.Unbind();
 }
 
-void Block::drawTop(Camera& camera) {
-    shaderCameraTextureActivate(camera);
+void Block::drawTop() {
 	vao.Bind();
 	glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(24 * sizeof(GLuint)), ibo.instances.size());
     vao.Unbind();
 }
-void Block::drawBottom(Camera& camera) {
-    shaderCameraTextureActivate(camera);
+void Block::drawBottom() {
 	vao.Bind();
 	glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(30 * sizeof(GLuint)), ibo.instances.size());
     vao.Unbind();
 }
-void Block::drawNorth(Camera& camera) {
-    shaderCameraTextureActivate(camera);
+void Block::drawNorth() {
 	vao.Bind();
 	glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(0 * sizeof(GLuint)), ibo.instances.size());
     vao.Unbind();
 }
-void Block::drawSouth(Camera& camera) {
-    shaderCameraTextureActivate(camera);
+void Block::drawSouth() {
 	vao.Bind();
 	glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(6 * sizeof(GLuint)), ibo.instances.size());
     vao.Unbind();
 }
-void Block::drawEast(Camera& camera) {
-    shaderCameraTextureActivate(camera);
+void Block::drawEast() {
 	vao.Bind();
 	glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(18 * sizeof(GLuint)), ibo.instances.size());
     vao.Unbind();
 }
-void Block::drawWest(Camera& camera) {
-    shaderCameraTextureActivate(camera);
+void Block::drawWest() {
 	vao.Bind();
 	glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(12 * sizeof(GLuint)), ibo.instances.size());
     vao.Unbind();

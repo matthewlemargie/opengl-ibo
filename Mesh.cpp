@@ -1,7 +1,7 @@
 #include "Mesh.h"
 
-Mesh::Mesh(const std::string& model, Shader& shader, float& scale, glm::vec4& lightColor, glm::vec3& lightPos)
-: shader(&shader), scale(&scale), lightColor(&lightColor), lightPos(&lightPos)
+Mesh::Mesh(const std::string& model, Shader& shader, float& scale)
+: shader(&shader), scale(&scale)
 {
 	Model modelData;
 	modelData.load(model);
@@ -27,8 +27,8 @@ Mesh::Mesh(const std::string& model, Shader& shader, float& scale, glm::vec4& li
 	ebo.Unbind();
 }
 
-Mesh::Mesh(GLfloat* vertices, size_t vertexSize, GLuint* indices, size_t indexSize, Shader& shader, float& scale, glm::vec4& lightColor, glm::vec3& lightPos)
-: shader(&shader), scale(&scale), lightColor(&lightColor), lightPos(&lightPos)
+Mesh::Mesh(GLfloat* vertices, size_t vertexSize, GLuint* indices, size_t indexSize, Shader& shader, float& scale)
+: shader(&shader), scale(&scale)
 {
     this->faceVertices = vertices;
     this->faceIndices = indices;
@@ -67,11 +67,6 @@ void Mesh::addFaceInstance(std::vector<glm::mat4> instanceMats) {
 
 void Mesh::Draw(Camera& camera)
 {
-    shader->Activate();
-    glUniform1f(glGetUniformLocation(shader->ID, "scale"), *scale);
-    glUniform4f(glGetUniformLocation(shader->ID, "lightColor"), lightColor->x, lightColor->y, lightColor->z, lightColor->w);
-    glUniform3f(glGetUniformLocation(shader->ID, "lightPos"), lightPos->x, lightPos->y, lightPos->z);
-    camera.Matrix(*shader, "camMatrix");
 	vao.Bind();
 	glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0, ibo.instances.size());
     vao.Unbind();
