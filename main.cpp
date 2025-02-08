@@ -16,6 +16,7 @@
 #include "shaderClass.h"
 #include "Scene.h"
 #include "block.h"
+#include "skybox.h"
 
 float generateRandomFloat() {
     // Create a random device and use it to seed the random number generator
@@ -80,6 +81,10 @@ int main(void)
     unsigned int samples = 32;
 
     glfwWindowHint(GLFW_SAMPLES, samples);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_DOUBLEBUFFER, GL_TRUE);
 
     // initiliaze monitor/window/mode
     GLFWmonitor* monitor = glfwGetPrimaryMonitor();
@@ -88,12 +93,16 @@ int main(void)
         glfwTerminate();
         return -1;
     }
+
     const GLFWvidmode* mode = glfwGetVideoMode(monitor);
     if (!mode) {
         std::cerr << "Failed to get video mode!" << std::endl;
         glfwTerminate();
         return -1;
     }
+
+    glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+
     window = glfwCreateWindow(mode->width, mode->height, "OpenGL Window", monitor, NULL);
     if (!window) {
         glfwTerminate();
@@ -112,6 +121,7 @@ int main(void)
     float scale = 10.0f;
 
     Camera camera(mode->width, mode->height, glm::vec3(4.0f, 0.0f, 0.0f), 60.0f, 1.0f, 5000.0f);
+    Skybox skybox(camera);
 
     Scene scene(window, mode, &camera);
 
@@ -149,6 +159,16 @@ int main(void)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
     glDepthFunc(GL_LESS);
+    // glEnable(GL_CULL_FACE);  // Enable face culling
+    // glCullFace(GL_FRONT);      // Cull back faces (default)
+    // glFrontFace(GL_CCW);      // Define front faces as counterclockwise (CCW)
+
+    typedef void (*GLSwapIntervalFunc)(int);
+    GLSwapIntervalFunc wglSwapIntervalEXT = (GLSwapIntervalFunc)glfwGetProcAddress("wglSwapIntervalEXT");
+    if (wglSwapIntervalEXT) {
+        wglSwapIntervalEXT(1);
+    }
+
     glfwSwapInterval(1);
 
     WireframeToggler wireframetoggler(window);
@@ -158,7 +178,7 @@ int main(void)
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        fpsCounter.outputFPS();
+        // fpsCounter.outputFPS();
         wireframetoggler.toggleWireframe(window);
 
 		timeValue = glfwGetTime();
@@ -168,6 +188,7 @@ int main(void)
         camera.Inputs(window);
         camera.updateMatrix();
 
+        skybox.Draw();
         scene.Render();
 
         glfwSwapBuffers(window);
