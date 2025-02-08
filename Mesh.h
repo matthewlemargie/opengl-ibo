@@ -53,7 +53,6 @@ struct Mesh
     Mesh(GLfloat* vertices, size_t vertexSize, GLuint* indices, size_t indexSize, Shader& shader, float& scale);
 
     void addInstance(std::vector<glm::mat4> instanceMats);
-    void addFaceInstance(std::vector<glm::mat4> instanceMats);
     void Draw(Camera& camera);
 
     void Inputs(GLFWwindow* window);

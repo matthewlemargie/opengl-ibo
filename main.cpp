@@ -22,7 +22,13 @@ int main(void)
     Camera camera(glContext.window, glContext.mode->width, glContext.mode->height, glm::vec3(4.0f, 0.0f, 0.0f), 60.0f, 1.0f, 5000.0f);
     Scene scene(&glContext);
     Shader shader("default.vert", "default.frag");
+    Shader lightShader("light.vert", "light.frag");
     // Shader rayShader("ray.vert", "ray.frag");
+
+    Mesh lightCube("box.obj", lightShader, scale);
+    vector<glm::mat4> lightModel = {glm::mat4(1.0f)};
+    scene.addObject(lightCube);
+    lightCube.addInstance(lightModel);
 
     Mesh box("box.obj", shader, scale);
     glm::mat4 transform = glm::mat4(1.0f);
@@ -46,6 +52,7 @@ int main(void)
 
     while (glContext.isWindowOpen())
     {
+        glContext.fpsCounter.outputFPS();
         scene.Render(&camera);
         glfwSwapBuffers(glContext.window);
         glfwPollEvents();
@@ -57,8 +64,4 @@ int main(void)
     return 0;
 }
 
-//Mesh lightCube("C:/Users/matth/Downloads/box.obj");
-//Shader lightShader("light.vert", "light.frag");
-//vector<glm::mat4> lightModel = {glm::mat4(1.0f)};
-//scene.addObject(lightCube, lightShader, lightModel);
 

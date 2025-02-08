@@ -14,8 +14,6 @@ void Scene::addBlock(Block& block) {
 }
 
 void Scene::Render(Camera* camera) {
-    glContext->fpsCounter.outputFPS();
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     timeValue = glfwGetTime();

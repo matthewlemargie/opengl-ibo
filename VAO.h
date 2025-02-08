@@ -15,7 +15,6 @@ struct VAO
 
 	void LinkAttrib(VBO& VBO, GLuint layout, GLuint numComponents, GLenum type, GLenum stride, void* offset);
 	void LinkInstance(IBO& IBO);
-    void LinkFaceInstance(IBO& IBO);
 	void Bind();
 	void Unbind();
 	void Delete();

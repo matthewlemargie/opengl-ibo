@@ -19,7 +19,7 @@ Mesh::Mesh(const std::string& model, Shader& shader, float& scale)
 	EBO ebo(indices);
 	vao.LinkAttrib(vbo, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, position));
 	vao.LinkAttrib(vbo, 1, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-	vao.LinkAttrib(vbo, 2, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, texUV));
+	// vao.LinkAttrib(vbo, 2, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, texUV));
 	vao.LinkInstance(ibo);
 
 	vao.Unbind();
@@ -53,14 +53,6 @@ void Mesh::addInstance(std::vector<glm::mat4> instanceMats) {
     vao.Bind();
     ibo.Bind();
     ibo.addInstance(instanceMats, modelAABB);
-    ibo.Unbind();
-    vao.Unbind();
-}
-
-void Mesh::addFaceInstance(std::vector<glm::mat4> instanceMats) {
-    vao.Bind();
-    ibo.Bind();
-    ibo.addInstance(instanceMats);
     ibo.Unbind();
     vao.Unbind();
 }
