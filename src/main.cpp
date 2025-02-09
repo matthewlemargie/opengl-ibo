@@ -22,7 +22,7 @@ int main()
     while (glContext.isWindowOpen())
     {
         auto startTime = std::chrono::high_resolution_clock::now();
-        glContext.fpsCounter.outputFPS();
+        // glContext.fpsCounter.outputFPS();
 
         // rendering
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

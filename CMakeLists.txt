@@ -6,9 +6,12 @@ project(MyProject VERSION 1.0)
 # Set the C++ standard
 set(CMAKE_CXX_STANDARD 11)
 
+set(SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
+include_directories(${SOURCE_DIR})
+
 # Specify the path to the lib directory
 # link_directories(${CMAKE_SOURCE_DIR}/lib)
-file(GLOB SOURCES "*.cpp")
+file(GLOB SOURCES "${SOURCE_DIR}/*.cpp")
 
 # Add executable target
 add_executable(main ${SOURCES})

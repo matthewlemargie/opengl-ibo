@@ -20,28 +20,28 @@ Skybox::Skybox()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     // std::string parentDir = (filesystem::current_path().filesystem::path::parent_path()).string();
-    std::string parentDir = "/home/dmac/Documents/projects2025/opengl-ibo";
-    std::string spaceboxDir = "/assets/skyboxes/spacebox";
-    std::string skyboxDir = "/assets/skyboxes/cloudy/blue";
+    // parentDir = parentDir + "/src";
+    std::string spaceboxDir = "assets/skyboxes/spacebox";
+    std::string skyboxDir = "assets/skyboxes/cloudy/blue";
 	// All the faces of the cubemap (make sure they are in this exact order)
 	std::string facesCubemap[6] =
 	{
-        parentDir + skyboxDir + "/right.png",
-        parentDir + skyboxDir + "/left.png",
-        parentDir + skyboxDir + "/up.png",
-        parentDir + skyboxDir + "/down.png",
-        parentDir + skyboxDir + "/front.png",
-        parentDir + skyboxDir + "/back.png",
+        skyboxDir + "/right.png",
+        skyboxDir + "/left.png",
+        skyboxDir + "/up.png",
+        skyboxDir + "/down.png",
+        skyboxDir + "/front.png",
+        skyboxDir + "/back.png",
 	};
 
 	std::string spaceboxImages[6] =
 	{
-        parentDir + spaceboxDir + "/right.png",
-        parentDir + spaceboxDir + "/left.png",
-        parentDir + spaceboxDir + "/top.png",
-        parentDir + spaceboxDir + "/bottom.png",
-        parentDir + spaceboxDir + "/front.png",
-        parentDir + spaceboxDir + "/back.png",
+        spaceboxDir + "/right.png",
+        spaceboxDir + "/left.png",
+        spaceboxDir + "/top.png",
+        spaceboxDir + "/bottom.png",
+        spaceboxDir + "/front.png",
+        spaceboxDir + "/back.png",
 	};
 
 	// Creates the cubemap texture object
