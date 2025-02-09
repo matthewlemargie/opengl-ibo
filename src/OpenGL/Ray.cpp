@@ -1,4 +1,4 @@
-#include "calculateRays.h"
+#include "Ray.h"
 
 glm::vec3 calculateRayWorld(GLFWwindow* window, const Camera* camera, const GLFWvidmode* mode){
     double mouseX, mouseY;

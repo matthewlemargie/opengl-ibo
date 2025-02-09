@@ -10,7 +10,7 @@
 #include <map>
 #include <vector>
 #include <string>
-#include "VBO.h"
+#include "OpenGL/VBO.h"
 
 struct Model
 {

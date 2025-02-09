@@ -1,6 +1,5 @@
 #include "ModelLoader.h"
 
-
 bool Model::load(const std::string& filename)
 {
     std::ifstream file(filename);

@@ -6,9 +6,9 @@
 #include <chrono>
 #include <thread>
 
-#include "GLContext.h"
-#include "Camera.h"
-#include "Scene.h"
+#include "OpenGL/GLContext.h"
+#include "OpenGL/Camera.h"
+#include "OpenGL/Scene.h"
 
 int main()
 {
@@ -22,7 +22,7 @@ int main()
     while (glContext.isWindowOpen())
     {
         auto startTime = std::chrono::high_resolution_clock::now();
-        // glContext.fpsCounter.outputFPS();
+        glContext.fpsCounter.outputFPS();
 
         // rendering
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

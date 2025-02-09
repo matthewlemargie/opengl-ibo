@@ -6,14 +6,14 @@
 #include <vector>
 
 #include "GLContext.h"
-#include "ModelLoader.h"
+#include "../ModelLoader.h"
 #include "Mesh.h"
-#include "block.h"
+#include "../block.h"
 #include "skybox.h"
 #include "shaderClass.h"
-#include "calculateRays.h"
+#include "Ray.h"
 #include "Wireframe.h"
-#include "GenerateRandoms.h"
+#include "../GenerateRandoms.h"
 
 struct Scene {
     GLContext* glContext;

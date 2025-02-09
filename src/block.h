@@ -6,13 +6,13 @@
 #include <GL/gl.h>
 #include <glm/glm.hpp>
 
-#include "VAO.h"
-#include "VBO.h"
-#include "EBO.h"
-#include "IBO.h"
-#include "Texture.h"
-#include "shaderClass.h"
-#include "Camera.h"
+#include "OpenGL/VAO.h"
+#include "OpenGL/VBO.h"
+#include "OpenGL/EBO.h"
+#include "OpenGL/IBO.h"
+#include "OpenGL/Texture.h"
+#include "OpenGL/shaderClass.h"
+#include "OpenGL/Camera.h"
 #include "AABB.h"
 
 struct Block {

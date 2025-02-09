@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "VBO.h"
-#include "AABB.h"
+#include "../AABB.h"
 
 struct IBO
 {

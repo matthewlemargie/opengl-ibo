@@ -5,7 +5,7 @@
 #include <glm/glm.hpp>
 #include "Camera.h"
 #include "Mesh.h"
-#include "block.h"
+#include "../block.h"
 #include "GLContext.h"
 
 glm::vec3 calculateRayWorld(GLFWwindow* window, const Camera* camera, const GLFWvidmode* mode);

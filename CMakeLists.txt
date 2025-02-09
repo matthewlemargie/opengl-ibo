@@ -5,16 +5,22 @@ project(MyProject VERSION 1.0)
 
 # Set the C++ standard
 set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
-include_directories(${SOURCE_DIR})
+# Define source files
+file(GLOB_RECURSE SRC_FILES 
+    src/*.cpp
+    src/OpenGL/*.cpp
+)
 
-# Specify the path to the lib directory
-# link_directories(${CMAKE_SOURCE_DIR}/lib)
-file(GLOB SOURCES "${SOURCE_DIR}/*.cpp")
+# Define include directories
+include_directories(
+    src
+    src/OpenGL
+)
 
-# Add executable target
-add_executable(main ${SOURCES})
+# Create executable
+add_executable(main ${SRC_FILES})
 
 # Link the library (e.g., static or shared)
 target_link_libraries(main PRIVATE glfw GLEW GL)

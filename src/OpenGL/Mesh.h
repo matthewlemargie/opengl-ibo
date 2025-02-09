@@ -5,14 +5,14 @@
 #include <vector>
 #include <glm/glm.hpp>
 
-#include "ModelLoader.h"
+#include "../ModelLoader.h"
 #include "VAO.h"
 #include "VBO.h"
 #include "IBO.h"
 #include "EBO.h"
 #include "Texture.h"
 #include "Camera.h"
-#include "AABB.h"
+#include "../AABB.h"
 
 
 struct Mesh
