@@ -34,8 +34,10 @@ struct Camera
 	float hFar = 1.0f;
 	float wNear= 1.0f;
 	float wFar = 1.0f;
-	float normalSpeed = 3.0f * (float)(60.0 / glContext->mode->refreshRate);
-	float fastSpeed = 2.0f * normalSpeed;
+	// float normalSpeed = 3.0f * (float)(60.0 / glContext->mode->refreshRate);
+	// float fastSpeed = 2.0f * normalSpeed;
+	float normalSpeed;
+	float fastSpeed;
     float speed;
 	float sensitivity = 100.0f;
 
@@ -52,6 +54,10 @@ struct Camera
 	GLuint VAO, VBO;
 
     Shader frustumShader;
+
+    double startTime = 0.0;
+    double endTime = 0.0;
+    double timeDiff = 0.0;
 
 	Camera(GLContext* glContext, glm::vec3 position, float FOVdeg, float nearPlane, float farPlane);
 

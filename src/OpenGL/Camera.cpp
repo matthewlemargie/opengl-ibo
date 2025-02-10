@@ -38,6 +38,8 @@ FOVdeg(FOVdeg), nearPlane(nearPlane), farPlane(farPlane), mouseX(0.0f), mouseY(0
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)0);
     glEnableVertexAttribArray(0);
 
+    startTime = glfwGetTime();
+
 }
 
 void Camera::updateMatrix()
@@ -70,6 +72,21 @@ void Camera::drawFrustumFromCamera(Camera& camera) {
 
 void Camera::Inputs()
 {
+    endTime = glfwGetTime();
+    timeDiff = endTime - startTime;
+    normalSpeed = 3.0f * (float)(60.0 * timeDiff);
+	fastSpeed = 2.0f * normalSpeed;
+    startTime = glfwGetTime();
+
+	if (glfwGetKey(glContext->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+	{
+		speed = fastSpeed;
+	}
+	else if (glfwGetKey(glContext->window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
+	{
+		speed = normalSpeed;
+	}
+
 	if (glfwGetKey(glContext->window, GLFW_KEY_W) == GLFW_PRESS)
 	{
 		Position += speed * Orientation;
@@ -99,14 +116,7 @@ void Camera::Inputs()
 		Position = initialPosition;
 		Orientation = initialOrientation;
 	}
-	if (glfwGetKey(glContext->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-	{
-		speed = fastSpeed;
-	}
-	else if (glfwGetKey(glContext->window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
-	{
-		speed = normalSpeed;
-	}
+
 	double lastX = width / 2.0, lastY = height / 2.0;
 
 	if (glfwGetMouseButton(glContext->window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
