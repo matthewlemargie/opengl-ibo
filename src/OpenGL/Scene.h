@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <set>
 #include <vector>
+#include <thread>
 
 #include "GLContext.h"
 #include "../ModelLoader.h"

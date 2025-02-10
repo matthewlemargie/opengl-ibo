@@ -8,18 +8,41 @@ Scene::Scene(struct GLContext* GLContext)
         exit(EXIT_FAILURE);
     }
 
-    // create simple scene for rendering
+    // Create simple scene for rendering
     Block* block = new Block(scale);
     glm::mat4 transform;
-    std::vector<glm::mat4> transforms;
-    transforms.clear();
-    for (int i = 0; i < 10000; ++i) {
-        transform = glm::translate(glm::mat4(1.0f), 750.0f * glm::vec3(generateFromNormal(), generateFromNormal(), generateFromNormal()));
-        transforms.emplace_back(transform);
+    std::vector<glm::mat4> transforms(500000); // Pre-allocate space for transforms
+    int numThreads = 4; // Number of threads to use
+    int chunkSize = transforms.size() / numThreads; // Split work into chunks
+
+    std::vector<std::thread> threads;
+
+    double loadStartTime = glfwGetTime();
+    for (int t = 0; t < numThreads; ++t) {
+        int start = t * chunkSize;
+        int end = (t == numThreads - 1) ? transforms.size() : (t + 1) * chunkSize; // Handle remainder in last thread
+
+        threads.emplace_back([&transforms, start, end]() {
+            glm::mat4 transform;
+            for (int i = start; i < end; ++i) {
+                transform = glm::translate(glm::mat4(1.0f), 5000.0f * glm::vec3(generateFromNormal(), generateFromNormal(), generateFromNormal()));
+                transforms[i] = transform;
+            }
+        });
     }
+
+    for (auto& thread : threads) {
+        thread.join();
+    }
+
+    double loadEndTime = glfwGetTime();
+    cout << "# of threads: " << numThreads << endl;
+    cout << "Total load time: " << loadEndTime - loadStartTime << "s" << endl;
+
     addBlock(*block);
     block->addInstance(transforms);
 }
+
 
 void Scene::addObject(Mesh& mesh) {
     Mesh* meshPtr = &mesh;
