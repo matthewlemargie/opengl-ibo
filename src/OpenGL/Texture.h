@@ -1,9 +1,12 @@
 #ifndef TEXTURE_CLASS_H
 #define TEXTURE_CLASS_H
 
-#include "stb/stb_image.h"
-
 #include "shaderClass.h"
+
+#include <stb/stb_image.h>
+#include <GLFW/glfw3.h>
+#include <GL/gl.h>
+
 
 struct Texture
 {

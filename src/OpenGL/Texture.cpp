@@ -3,6 +3,7 @@
 
 Texture::Texture(const char* image, GLenum texType, GLenum slot, GLenum format, GLenum pixelType)
 {
+    double startTime = glfwGetTime();
 	type = texType;
 	int widthImg, heightImg, numColCh;
 	stbi_set_flip_vertically_on_load(true);
@@ -23,6 +24,8 @@ Texture::Texture(const char* image, GLenum texType, GLenum slot, GLenum format, 
 
 	stbi_image_free(bytes);
 	glBindTexture(GL_TEXTURE_2D, 0);
+    double timeDiff = glfwGetTime() - startTime;
+    cout << image << " loaded in " << timeDiff << "s" << endl;
 }
 
 void Texture::texUnit(Shader shader, const char* uniform, GLuint unit) {

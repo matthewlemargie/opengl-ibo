@@ -3,6 +3,7 @@
 Block::Block(float& scale) 
 : scale(&scale) 
 {
+    double startTime = glfwGetTime();
     vao.Bind();
     vbo.addVertices(cubeVertices, sizeof(cubeVertices));
     EBO ebo(cubeIndices, sizeof(cubeIndices));
@@ -18,8 +19,10 @@ Block::Block(float& scale)
 
     modelAABB = AABB(scale * glm::vec3(-0.5f, -0.5f, -0.5f), scale * glm::vec3(0.5f, 0.5f, 0.5f));
 
-    grass = new Texture("assets/textures/grass.jpg", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
     shader = new Shader("shaders/face_vert.glsl", "shaders/face_frag.glsl");
+    grass = new Texture("assets/textures/grass.jpg", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
+    double timeDiff = glfwGetTime() - startTime;
+    cout << "Block " << vao.ID << " initialized in " << timeDiff << "s" << endl;
 }
 
 Block::~Block() {

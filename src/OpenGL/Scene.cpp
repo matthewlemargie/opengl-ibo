@@ -11,13 +11,13 @@ Scene::Scene(struct GLContext* GLContext)
     // Create simple scene for rendering
     Block* block = new Block(scale);
     glm::mat4 transform;
-    std::vector<glm::mat4> transforms(int(float(100000)/std::powf(2, 3))); // Pre-allocate space for transforms
+    std::vector<glm::mat4> transforms(int(float(std::powf(2, 16))/std::powf(2, 0))); // Pre-allocate space for transforms
     int numThreads = 4; // Number of threads to use
     int chunkSize = transforms.size() / numThreads; // Split work into chunks
 
     std::vector<std::thread> threads;
 
-    // double loadStartTime = glfwGetTime();
+    double loadStartTime = glfwGetTime();
     for (int t = 0; t < numThreads; ++t) {
         int start = t * chunkSize;
         int end = (t == numThreads - 1) ? transforms.size() : (t + 1) * chunkSize; // Handle remainder in last thread
@@ -35,12 +35,15 @@ Scene::Scene(struct GLContext* GLContext)
         thread.join();
     }
 
-    // double loadEndTime = glfwGetTime();
-    // cout << "# of threads: " << numThreads << endl;
-    // cout << "Total load time: " << loadEndTime - loadStartTime << "s" << endl;
+    double loadTotalTime = glfwGetTime() - loadStartTime;
+    cout << "# of threads: " << numThreads << endl;
+    cout << "Total load time: " << loadTotalTime << "s" << endl;
 
     addBlock(*block);
+    double vaoInitStartTime = glfwGetTime();
     block->addInstance(transforms);
+    double vaoInitTotalTime = glfwGetTime() - vaoInitStartTime;
+    cout << "Added instances to block IBO in " << vaoInitTotalTime << "s" << endl;
 }
 
 

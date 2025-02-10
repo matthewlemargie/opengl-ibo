@@ -12,9 +12,12 @@
 
 int main()
 {
+    double start = glfwGetTime();
     GLContext glContext;
     Camera camera(&glContext, glm::vec3(4.0f, 0.0f, 0.0f), 60.0f, 1.0f, 5000.0f);
     Scene scene(&glContext);
+    double timeToPrepare = glfwGetTime() - start;
+    cout << "Scene prepared in " << timeToPrepare << "s" << endl;
 
     const double targetFPS = glContext.mode->refreshRate;
     const double frameTime = 1.0 / targetFPS;
@@ -22,7 +25,7 @@ int main()
     while (glContext.isWindowOpen())
     {
         auto startTime = std::chrono::high_resolution_clock::now();
-        glContext.fpsCounter.outputFPS();
+        // glContext.fpsCounter.outputFPS();
 
         // rendering
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
