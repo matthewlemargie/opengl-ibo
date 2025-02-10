@@ -68,7 +68,7 @@ void Mesh::addInstance(glm::mat4 instanceMat) {
 void Mesh::Draw(Camera& camera)
 {
 	vao.Bind();
-	glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0, ibo.instances.size());
+	glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0, ibo.numInstances);
     vao.Unbind();
 }
 

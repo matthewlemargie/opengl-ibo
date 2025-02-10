@@ -15,7 +15,8 @@ struct IBO
 {
 	GLuint ID;
 	int maxInstances = 500000 + 1;
-    std::vector<glm::mat4> instances;
+    int numInstances = 0;
+    // std::vector<glm::mat4> instances;
     std::vector<AABB> aabbs;
 
 	IBO();
@@ -25,7 +26,7 @@ struct IBO
     void addInstance(std::vector<glm::mat4>& instanceMats);
     void addInstance(glm::mat4& instanceMat);
     void deleteInstance(int idx);
-    void updateBuffer();
+    // void updateBuffer();
 	void Bind();
 	void Unbind();
 	void Delete();
