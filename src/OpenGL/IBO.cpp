@@ -84,7 +84,6 @@ void IBO::deleteInstance(int idx) {
     numInstances--;
     double diff = glfwGetTime() - start;
     std::cout << "Instance deleted/remapped in " << diff << "s" << std::endl;
-
 }
 
 void IBO::Bind()

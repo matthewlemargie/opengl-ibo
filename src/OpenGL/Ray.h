@@ -3,6 +3,10 @@
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <thread>
+#include <iostream>
+#include <atomic>
+#include <mutex>
 #include "Camera.h"
 #include "Mesh.h"
 #include "../block.h"

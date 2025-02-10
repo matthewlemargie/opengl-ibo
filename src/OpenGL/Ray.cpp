@@ -62,13 +62,40 @@ void deleteMeshInstanceByRay(Mesh& mesh, GLFWwindow* window, const GLFWvidmode* 
 void deleteBlockInstanceByRay(Block& block, GLFWwindow* window, const GLFWvidmode* mode, Camera* camera) {
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
         glm::vec3 rayWorld = calculateRayWorld(window, camera, mode);
-        for (int i = 0; i < block.ibo.aabbs.size(); ++i) {
-            float tMin = 0.1f;
-            float tMax = 1000.0f;
-            if (block.ibo.aabbs[i].rayIntersects(camera->Position, rayWorld, tMin, tMax)) {
-                block.ibo.deleteInstance(i);
-            }
+        int numThreads = 4; // Number of threads to use
+        int chunkSize = block.ibo.aabbs.size() / numThreads;
+
+        std::atomic<bool> stopThreads(false);
+        std::mutex deleteMutex;
+
+        std::vector<std::thread> threads;
+        int toDelete = -1;
+
+        for (int t = 0; t < numThreads; ++t) {
+            int start = t * chunkSize;
+            int end = (t == numThreads - 1) ? block.ibo.aabbs.size() : (t + 1) * chunkSize;
+
+            threads.emplace_back([&block, &stopThreads, &deleteMutex, &toDelete, camera, rayWorld, start, end]() {
+                for (int i = start; i < end; ++i) {
+                    if (stopThreads.load()) return;
+                    float tMin = 0.1f;
+                    float tMax = 1000.0f;
+                    if (block.ibo.aabbs[i].rayIntersects(camera->Position, rayWorld, tMin, tMax)) {
+                        std::lock_guard<std::mutex> lock(deleteMutex);
+                        toDelete = i;
+                        stopThreads.store(true);
+                        return;
+                    }
+                }
+            });
         }
+        for (auto& thread : threads) {
+            thread.join();
+        }
+        stopThreads.store(false);
+
+        if (-toDelete)
+            block.ibo.deleteInstance(toDelete);
     }
 }
 
