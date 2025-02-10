@@ -4,6 +4,7 @@
 
 #include <GL/glew.h>
 #include <iostream>
+#include <GLFW/glfw3.h>
 #include <GL/gl.h>
 #include <glm/glm.hpp>
 #include <vector>
@@ -16,7 +17,6 @@ struct IBO
 	GLuint ID;
 	int maxInstances = 500000 + 1;
     int numInstances = 0;
-    // std::vector<glm::mat4> instances;
     std::vector<AABB> aabbs;
 
 	IBO();
@@ -26,7 +26,6 @@ struct IBO
     void addInstance(std::vector<glm::mat4>& instanceMats);
     void addInstance(glm::mat4& instanceMat);
     void deleteInstance(int idx);
-    // void updateBuffer();
 	void Bind();
 	void Unbind();
 	void Delete();

@@ -13,12 +13,12 @@ void IBO::addInstance(std::vector<glm::mat4>& instanceMats, AABB modelAABB) {
         return;
     }
 
-    // for (const auto& instanceMat : instanceMats) {
-        // glm::vec3 newMin = instanceMat * glm::vec4(modelAABB.min, 1.0f);
-        // glm::vec3 newMax = instanceMat * glm::vec4(modelAABB.max, 1.0f);
-        // AABB newAABB(newMin, newMax);
-        // aabbs.push_back(newAABB);
-    // }
+    for (const auto& instanceMat : instanceMats) {
+        glm::vec3 newMin = instanceMat * glm::vec4(modelAABB.min, 1.0f);
+        glm::vec3 newMax = instanceMat * glm::vec4(modelAABB.max, 1.0f);
+        AABB newAABB(newMin, newMax);
+        aabbs.push_back(newAABB);
+    }
 
     glBindBuffer(GL_ARRAY_BUFFER, ID);
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * numInstances, sizeof(glm::mat4) * instanceMats.size(), instanceMats.data());
@@ -71,21 +71,21 @@ void IBO::deleteInstance(int idx) {
     aabbs[idx] = aabbs.back();
     aabbs.pop_back();
 
+    double start = glfwGetTime();
     glBindBuffer(GL_ARRAY_BUFFER, ID);
-    GLvoid* data = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
-    glm::mat4* matrices = (glm::mat4*)data;
-    glBufferSubData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * idx, sizeof(glm::mat4), &matrices[idx]);
+    glm::mat4* mappedBuffer = (glm::mat4*)glMapBufferRange(GL_ARRAY_BUFFER, 0, numInstances * sizeof(glm::mat4), 
+                                                           GL_MAP_READ_BIT | GL_MAP_WRITE_BIT);
+    if (mappedBuffer) {
+        // Copy the last element to the target index
+        mappedBuffer[idx] = mappedBuffer[numInstances - 1];
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+    }
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
     numInstances--;
+    double diff = glfwGetTime() - start;
+    std::cout << "Instance deleted/remapped in " << diff << "s" << std::endl;
+
 }
-
-
-// void IBO::updateBuffer() {
-    // glBindBuffer(GL_ARRAY_BUFFER, ID);
-    // glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * numInstances(), instances.data(), GL_STATIC_DRAW);
-    // glBindBuffer(GL_ARRAY_BUFFER, 0);
-// }
 
 void IBO::Bind()
 {
