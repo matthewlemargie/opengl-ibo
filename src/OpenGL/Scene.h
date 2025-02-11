@@ -7,13 +7,14 @@
 #include <thread>
 
 #include "GLContext.h"
-#include "../ModelLoader.h"
 #include "Mesh.h"
-#include "../block.h"
 #include "skybox.h"
 #include "shaderClass.h"
 #include "Ray.h"
 #include "Wireframe.h"
+#include "../ModelLoader.h"
+#include "../blocks.h"
+// #include "../block.h"
 #include "../GenerateRandoms.h"
 
 struct Scene {

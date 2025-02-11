@@ -14,6 +14,7 @@
 #include "OpenGL/shaderClass.h"
 #include "OpenGL/Camera.h"
 #include "AABB.h"
+#include "chunk.h"
 
 struct Block {
     GLfloat cubeVertices[192] = {
@@ -73,6 +74,7 @@ struct Block {
     VAO vao;
     VBO vbo;
     IBO ibo;
+    std::vector<GLuint> ibos;
 
     Texture* grass;
     Shader* shader;

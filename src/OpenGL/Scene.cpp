@@ -19,7 +19,8 @@ Scene::Scene(struct GLContext* GLContext)
 
     double loadStartTime = glfwGetTime();
 
-    Block* block = new Block(scale);
+    // Block* block = new Block(scale);
+    Blocks* blocks = new Blocks(CHUNK_X_DIM, CHUNK_Y_DIM, CHUNK_Z_DIM, CHUNK_TOTAL_BLOCKS, BLOCKID_COUNT);
     for (int t = 0; t < numThreads; ++t) {
         int start = t * chunkSize;
         int end = (t == numThreads - 1) ? transforms.size() : (t + 1) * chunkSize; // Handle remainder in last thread
@@ -41,9 +42,9 @@ Scene::Scene(struct GLContext* GLContext)
     cout << "# of threads: " << numThreads << endl;
     cout << "Total load time: " << loadTotalTime << "s" << endl;
 
-    addBlock(*block);
+    // addBlock(*block);
     double vaoInitStartTime = glfwGetTime();
-    block->addInstance(transforms);
+    // block->addInstance(transforms);
     double vaoInitTotalTime = glfwGetTime() - vaoInitStartTime;
     cout << "Added instances to block IBO in " << vaoInitTotalTime << "s" << endl;
 }
