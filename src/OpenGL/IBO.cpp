@@ -71,7 +71,6 @@ void IBO::deleteInstance(int idx) {
     aabbs[idx] = aabbs.back();
     aabbs.pop_back();
 
-    double start = glfwGetTime();
     glBindBuffer(GL_ARRAY_BUFFER, ID);
     glm::mat4* mappedBuffer = (glm::mat4*)glMapBufferRange(GL_ARRAY_BUFFER, 0, numInstances * sizeof(glm::mat4), 
                                                            GL_MAP_READ_BIT | GL_MAP_WRITE_BIT);
@@ -82,8 +81,6 @@ void IBO::deleteInstance(int idx) {
     }
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     numInstances--;
-    double diff = glfwGetTime() - start;
-    std::cout << "Instance deleted/remapped in " << diff << "s" << std::endl;
 }
 
 void IBO::Bind()

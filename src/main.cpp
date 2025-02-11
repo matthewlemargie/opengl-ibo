@@ -10,8 +10,12 @@
 #include "OpenGL/Camera.h"
 #include "OpenGL/Scene.h"
 
+#include "chunk.h"
+
 int main()
 {
+    Chunk chunk;
+
     double start = glfwGetTime();
     GLContext glContext;
     Camera camera(&glContext, glm::vec3(4.0f, 0.0f, 0.0f), 60.0f, 1.0f, 5000.0f);

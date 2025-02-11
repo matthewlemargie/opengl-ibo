@@ -10,7 +10,7 @@ Scene::Scene(struct GLContext* GLContext)
 
     // Create simple scene for rendering
     glm::mat4 transform;
-    std::vector<glm::mat4> transforms(int(float(100000)/std::powf(2, 3))); // Pre-allocate space for transforms
+    std::vector<glm::mat4> transforms(int(float(100000)/std::powf(2, 0))); // Pre-allocate space for transforms
     // std::vector<glm::mat4> transforms(int(float(std::powf(2, 16))/std::powf(2, 0))); // Pre-allocate space for transforms
     int numThreads = 4; // Number of threads to use
     int chunkSize = transforms.size() / numThreads; // Split work into chunks
