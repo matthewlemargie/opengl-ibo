@@ -19,6 +19,14 @@ GLContext::GLContext() : window(nullptr), monitor(nullptr), mode(nullptr) {
         glfwTerminate();
         return;
     }
+    // Set GLFW window hints
+    unsigned int samples = 16;
+    glfwWindowHint(GLFW_SAMPLES, samples);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_DOUBLEBUFFER, GL_TRUE);
     // Create the GLFW window
     window = glfwCreateWindow(mode->width, mode->height, "OpenGL Window", monitor, NULL);
     if (!window) {
@@ -29,16 +37,9 @@ GLContext::GLContext() : window(nullptr), monitor(nullptr), mode(nullptr) {
 
     glfwMakeContextCurrent(window);
     glViewport(0, 0, mode->width, mode->height);
-    // Set GLFW window hints
-    unsigned int samples = 32;
-    glfwWindowHint(GLFW_SAMPLES, samples);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_DOUBLEBUFFER, GL_TRUE);
-    glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
     glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
+    glewExperimental = GL_TRUE;
     // Initialize GLEW
     if (glewInit() != GLEW_OK) {
         std::cerr << "Failed to initialize GLEW!" << std::endl;
@@ -55,6 +56,11 @@ GLContext::GLContext() : window(nullptr), monitor(nullptr), mode(nullptr) {
     // glFrontFace(GL_CCW);      // Define front faces as counterclockwise (CCW)
 
     glfwSwapInterval(0);
+
+    // double check MSAA antialiasing is working properly
+    int msaa;
+    glGetIntegerv(GL_SAMPLES, &msaa);
+    std::cout << "MSAA Samples: " << samples << std::endl;
 }
 
 GLContext::~GLContext() {

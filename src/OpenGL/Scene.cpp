@@ -27,7 +27,7 @@ Scene::Scene(struct GLContext* GLContext)
         threads.emplace_back([&transforms, start, end]() {
             glm::mat4 transform;
             for (int i = start; i < end; ++i) {
-                transform = glm::translate(glm::mat4(1.0f), 1000.0f * glm::vec3(generateFromNormal(), generateFromNormal(), generateFromNormal()));
+                transform = glm::translate(glm::mat4(1.0f), 3000.0f * glm::vec3(generateFromNormal(), generateFromNormal(), generateFromNormal()));
                 transforms[i] = transform;
             }
         });
