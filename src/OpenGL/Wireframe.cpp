@@ -9,10 +9,8 @@ void WireframeToggler::toggleWireframe() {
     if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) {
         if (!keyPressedLastFrame) {
             if (!wireframeMode) {
-                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
                 wireframeMode = true;
             } else {
-                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
                 wireframeMode = false;
             }
 

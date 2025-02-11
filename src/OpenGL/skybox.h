@@ -6,11 +6,11 @@
 #include <stb/stb_image.h>
 #include <string>
 #include <iostream>
+#include <filesystem>
 
 #include "Camera.h"
 #include "shaderClass.h"
 
-#include<filesystem>
 
 struct Skybox {
     GLfloat skyboxVertices[24] =

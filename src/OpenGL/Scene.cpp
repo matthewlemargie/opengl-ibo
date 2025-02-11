@@ -67,9 +67,14 @@ void Scene::Render(Camera* camera) {
     camera->Inputs();
     camera->updateMatrix();
 
-    wireframetoggler.toggleWireframe();
 
     skybox.Draw(camera);
+    wireframetoggler.toggleWireframe();
+
+    if (wireframetoggler.wireframeMode)
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    else
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     for (auto& mesh : meshes) {
         mesh->shader->Activate();
@@ -90,6 +95,8 @@ void Scene::Render(Camera* camera) {
         deleteBlockInstanceByRay(*block, glContext->window, glContext->mode, camera);
         block->drawCube();
     }
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 // Mesh* lightCube = new Mesh("box.obj", lightShader, scale);
