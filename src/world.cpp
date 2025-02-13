@@ -2,7 +2,7 @@
 
 World::World(GLContext* context) 
 {
-    double startTime = glfwGetTime();
+    auto start = std::chrono::high_resolution_clock::now();
     shader = new Shader("shaders/block_vert.glsl", "shaders/block_frag.glsl");
     grass = new Texture("assets/textures/grass.jpg", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
     modelAABB = AABB(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.5f, 0.5f, 0.5f));
@@ -47,7 +47,9 @@ World::World(GLContext* context)
         glBindVertexArray(0);
     }
 
-    double timeDiff = glfwGetTime() - startTime;
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> duration = end - start;
+    cout << "world initialized in " << duration.count() << "s" << endl;
 }
 
 World::~World() {
@@ -90,7 +92,7 @@ std::vector<std::vector<GLfloat>> World::populateChunk() {
 
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duration = end - start;
-    std::cout << "Chunk populated in " << duration.count() << " seconds" << std::endl;
+    std::cout << "Chunk populated in " << duration.count() << " s" << std::endl;
 
     return newBlockInstances;
 }
@@ -140,10 +142,11 @@ void World::textureActivate() {
 }
 
 void World::Render(Camera& camera) {
+    auto start = std::chrono::high_resolution_clock::now();
     camera.Inputs();
     camera.updateMatrix();
     camera.Matrix(*shader, "camMatrix");
-    skybox.Draw(&camera);
+    // skybox.Draw(&camera);
 
     textureActivate();
     GLuint vao, ebo, ibo;
@@ -156,12 +159,16 @@ void World::Render(Camera& camera) {
         glBindBuffer(GL_ARRAY_BUFFER, ibo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
+
         // if (bufferSize > 0) {
             // GLint instanceCount = bufferSize / (3 * sizeof(GLfloat));
         glDrawElementsInstanced(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0, 4096);
         // }
     }
     glBindVertexArray(0);
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> duration = end - start;
+    std::cout << "Entire render call took " << duration.count() << " s" << std::endl;
 }
 
 
