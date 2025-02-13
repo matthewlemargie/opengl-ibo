@@ -47,7 +47,7 @@ GLContext::GLContext() : window(nullptr), monitor(nullptr), mode(nullptr) {
         return;
     }
 
-	glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+	glClearColor(0.53f, 0.80f, 0.92f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
     glDepthFunc(GL_LESS);

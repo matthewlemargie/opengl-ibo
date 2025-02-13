@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <tuple>
 
-#include "blocks.h"
+#include "world.h"
 
 struct Chunk {
     BlockID* chunkblocks;

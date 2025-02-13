@@ -1,6 +1,6 @@
-#include "blocks.h"
+#include "world.h"
 
-Blocks::Blocks(GLContext* context) 
+World::World(GLContext* context) 
 {
     double startTime = glfwGetTime();
     shader = new Shader("shaders/block_vert.glsl", "shaders/block_frag.glsl");
@@ -41,7 +41,7 @@ Blocks::Blocks(GLContext* context)
         glEnableVertexAttribArray(3);
         glVertexAttribDivisor(3, 1);
 
-        blocktypeToBuffersIDsMap.insert({i, {vao, ebo, ibo}});
+        blocktypeToBuffersIDsMap.insert({i, {vao, ebo, ibo, 0}});
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
@@ -50,19 +50,52 @@ Blocks::Blocks(GLContext* context)
     double timeDiff = glfwGetTime() - startTime;
 }
 
-Blocks::~Blocks() {
+World::~World() {
     delete grass;
     delete shader;
 }
 
-void Blocks::addInstance(int blockID, std::array<int,3> posInWorld) {
+void World::addInstance(int blockID, std::array<int,3> posInWorld) {
     // vao.Bind();
     // GLuint iboID = blocktypeToBufferIDsMap[blockID][1];
     // glBindBuffer(GL_ARRAY_BUFFER, iboID);
     // vao.Unbind();
 }
 
-void Blocks::addChunkToWorld(std::vector<std::vector<GLfloat>> newBlockInstances) {
+std::vector<std::vector<GLfloat>> World::populateChunk() {
+    std::vector<std::vector<GLfloat>> newBlockInstances(BLOCKID_COUNT);  // Direct initialization
+    
+    auto start = std::chrono::high_resolution_clock::now();
+
+    // Ensure you only iterate once for the chunk (16x16x16 blocks)
+    for (int i = 0; i < CHUNK_X_DIM; ++i) {
+        for (int j = 0; j < CHUNK_Y_DIM; ++j) {
+            for (int k = 0; k < CHUNK_Z_DIM; ++k) {
+                
+                // Choose blockID (if it remains constant, it's fine)
+                int newBlockID = GRASS;
+
+                // Add coordinates for the block at (i, j, k)
+                newBlockInstances[newBlockID].push_back(GLfloat(i));
+                newBlockInstances[newBlockID].push_back(GLfloat(j));
+                newBlockInstances[newBlockID].push_back(GLfloat(k));
+            }
+        }
+    }
+
+    // Output size to debug
+    for (int i = 0; i < BLOCKID_COUNT; ++i) {
+        std::cout << "Block Type " << i << ": " << newBlockInstances[i].size() / 3 << " instances" << std::endl;
+    }
+
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> duration = end - start;
+    std::cout << "Chunk populated in " << duration.count() << " seconds" << std::endl;
+
+    return newBlockInstances;
+}
+
+void World::addChunkToWorld(std::vector<std::vector<GLfloat>> newBlockInstances) {
     // vao.Bind();
     GLuint vao, iboID;
     GLint bufferSize;
@@ -101,12 +134,12 @@ void Blocks::addChunkToWorld(std::vector<std::vector<GLfloat>> newBlockInstances
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void Blocks::textureActivate() {
+void World::textureActivate() {
     grass->texUnit(*shader, "tex0", 0);
     grass->Bind();
 }
 
-void Blocks::Render(Camera& camera) {
+void World::Render(Camera& camera) {
     camera.Inputs();
     camera.updateMatrix();
     camera.Matrix(*shader, "camMatrix");
@@ -114,7 +147,6 @@ void Blocks::Render(Camera& camera) {
 
     textureActivate();
     GLuint vao, ebo, ibo;
-    GLint bufferSize;
     for (int i = 0; i < BLOCKID_COUNT; ++i) {
         vao = blocktypeToBuffersIDsMap[i][0];
         ebo = blocktypeToBuffersIDsMap[i][1];
@@ -122,47 +154,14 @@ void Blocks::Render(Camera& camera) {
 
         glBindVertexArray(vao);
         glBindBuffer(GL_ARRAY_BUFFER, ibo);
-        glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-        if (bufferSize > 0) {
-            GLint instanceCount = bufferSize / (3 * sizeof(GLfloat));
-            glDrawElementsInstanced(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0, 4096);
-        }
+        // if (bufferSize > 0) {
+            // GLint instanceCount = bufferSize / (3 * sizeof(GLfloat));
+        glDrawElementsInstanced(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0, 4096);
+        // }
     }
     glBindVertexArray(0);
 }
 
 
-std::vector<std::vector<GLfloat>> Blocks::populateChunk() {
-    std::vector<std::vector<GLfloat>> newBlockInstances(BLOCKID_COUNT);  // Direct initialization
-    
-    auto start = std::chrono::high_resolution_clock::now();
-
-    // Ensure you only iterate once for the chunk (16x16x16 blocks)
-    for (int i = 0; i < CHUNK_X_DIM; ++i) {
-        for (int j = 0; j < CHUNK_Y_DIM; ++j) {
-            for (int k = 0; k < CHUNK_Z_DIM; ++k) {
-                
-                // Choose blockID (if it remains constant, it's fine)
-                int newBlockID = GRASS;
-
-                // Add coordinates for the block at (i, j, k)
-                newBlockInstances[newBlockID].push_back(GLfloat(i));
-                newBlockInstances[newBlockID].push_back(GLfloat(j));
-                newBlockInstances[newBlockID].push_back(GLfloat(k));
-            }
-        }
-    }
-
-    // Output size to debug
-    for (int i = 0; i < BLOCKID_COUNT; ++i) {
-        std::cout << "Block Type " << i << ": " << newBlockInstances[i].size() / 3 << " instances" << std::endl;
-    }
-
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> duration = end - start;
-    std::cout << "Chunk populated in " << duration.count() << " seconds" << std::endl;
-
-    return newBlockInstances;
-}

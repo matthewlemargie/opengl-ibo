@@ -13,13 +13,13 @@
 #include "Ray.h"
 #include "Wireframe.h"
 #include "../ModelLoader.h"
-#include "../blocks.h"
+#include "../world.h"
 // #include "../block.h"
 #include "../GenerateRandoms.h"
 
 struct Scene {
     GLContext* glContext;
-    Blocks world;
+    World world;
 
     std::set<Mesh*> meshes;
     std::set<Block*> blocks;

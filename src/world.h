@@ -1,5 +1,5 @@
-#ifndef BLOCKS_H
-#define BLOCKS_H
+#ifndef WORLD_H
+#define WORLD_H
 #define GLM_ENABLE_EXPERIMENTAL
 
 #include <GL/glew.h>
@@ -31,7 +31,7 @@ enum BlockID {
     BLOCKID_COUNT,
 };
 
-struct Blocks {
+struct World {
     GLfloat cubeVertices[192] = {
         // Position           // Normal         // UV
         // Front face
@@ -132,15 +132,15 @@ struct Blocks {
     std::vector<GLuint> ebos;
     std::vector<GLuint> ibos;
 
-    unordered_map<GLuint, std::array<GLuint, 3>> blocktypeToBuffersIDsMap;
+    unordered_map<GLuint, std::array<GLuint, 4>> blocktypeToBuffersIDsMap;
 
     Texture* grass;
     Shader* shader;
 
     AABB modelAABB;
 
-    Blocks(GLContext* context);
-    ~Blocks();
+    World(GLContext* context);
+    ~World();
 
     void textureActivate();
     void addChunkToWorld(std::vector<std::vector<GLfloat>> newBlockInstances);

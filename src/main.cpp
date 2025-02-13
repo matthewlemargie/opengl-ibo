@@ -10,7 +10,7 @@
 #include "OpenGL/Camera.h"
 #include "OpenGL/Scene.h"
 
-#include "blocks.h"
+#include "world.h"
 
 int main()
 {
@@ -22,7 +22,7 @@ int main()
     double timeToPrepare = glfwGetTime() - start;
     cout << "Scene prepared in " << timeToPrepare << "s" << endl;
 
-    Blocks world(&glContext);
+    World world(&glContext);
     std::vector<std::vector<GLfloat>> newBlockPositions = world.populateChunk();
     world.addChunkToWorld(newBlockPositions);
 

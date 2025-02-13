@@ -14,7 +14,6 @@
 #include "OpenGL/shaderClass.h"
 #include "OpenGL/Camera.h"
 #include "AABB.h"
-#include "chunk.h"
 
 struct Block {
     GLfloat cubeVertices[192] = {
