@@ -36,7 +36,7 @@ Skybox::Skybox()
 
 	std::string spaceboxImages[6] =
 	{
-        spaceboxDir + "/right.png",
+        spaceboxDir + "/right-flip.png",
         spaceboxDir + "/left.png",
         spaceboxDir + "/top.png",
         spaceboxDir + "/bottom.png",

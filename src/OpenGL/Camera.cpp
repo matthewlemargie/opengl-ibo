@@ -74,7 +74,7 @@ void Camera::Inputs()
 {
     endTime = glfwGetTime();
     timeDiff = endTime - startTime;
-    normalSpeed = 3.0f * (float)(60.0 * timeDiff);
+    normalSpeed = 1.0f * (float)(60.0 * timeDiff);
 	fastSpeed = 2.0f * normalSpeed;
     startTime = glfwGetTime();
 

@@ -19,6 +19,7 @@
 
 struct Scene {
     GLContext* glContext;
+    Blocks world;
 
     std::set<Mesh*> meshes;
     std::set<Block*> blocks;

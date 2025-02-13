@@ -1,7 +1,7 @@
 #include "Scene.h"
 
 Scene::Scene(struct GLContext* GLContext)
-: glContext(GLContext), wireframetoggler(GLContext->window), shader("shaders/default_vert.glsl", "shaders/default_frag.glsl"), lightShader("shaders/light_vert.glsl", "shaders/light_frag.glsl") 
+: glContext(GLContext),  world(GLContext), wireframetoggler(GLContext->window), shader("shaders/default_vert.glsl", "shaders/default_frag.glsl"), lightShader("shaders/light_vert.glsl", "shaders/light_frag.glsl") 
 {
     if (!GLContext) {
         std::cerr << "Error: GLContext is null!" << std::endl;
@@ -10,7 +10,7 @@ Scene::Scene(struct GLContext* GLContext)
 
     // Create simple scene for rendering
     glm::mat4 transform;
-    std::vector<glm::mat4> transforms(int(float(100000)/std::powf(2, 0))); // Pre-allocate space for transforms
+    std::vector<glm::mat4> transforms(int(float(10000)/std::powf(2, 0))); // Pre-allocate space for transforms
     // std::vector<glm::mat4> transforms(int(float(std::powf(2, 16))/std::powf(2, 0))); // Pre-allocate space for transforms
     int numThreads = 4; // Number of threads to use
     int chunkSize = transforms.size() / numThreads; // Split work into chunks
@@ -20,7 +20,8 @@ Scene::Scene(struct GLContext* GLContext)
     double loadStartTime = glfwGetTime();
 
     // Block* block = new Block(scale);
-    Blocks* blocks = new Blocks(CHUNK_X_DIM, CHUNK_Y_DIM, CHUNK_Z_DIM, CHUNK_TOTAL_BLOCKS, BLOCKID_COUNT);
+    std::vector<std::vector<GLfloat>> newBlockPositions = world.populateChunk();
+    world.addChunkToWorld(newBlockPositions);
     for (int t = 0; t < numThreads; ++t) {
         int start = t * chunkSize;
         int end = (t == numThreads - 1) ? transforms.size() : (t + 1) * chunkSize; // Handle remainder in last thread
@@ -28,7 +29,7 @@ Scene::Scene(struct GLContext* GLContext)
         threads.emplace_back([&transforms, start, end]() {
             glm::mat4 transform;
             for (int i = start; i < end; ++i) {
-                transform = glm::translate(glm::mat4(1.0f), 3000.0f * glm::vec3(generateFromNormal(), generateFromNormal(), generateFromNormal()));
+                transform = glm::translate(glm::mat4(1.0f), 300.0f * glm::vec3(generateFromNormal(), generateFromNormal(), generateFromNormal()));
                 transforms[i] = transform;
             }
         });
@@ -77,6 +78,7 @@ void Scene::Render(Camera* camera) {
     else
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+    world.Render(*camera);
     for (auto& mesh : meshes) {
         mesh->shader->Activate();
         glUniform1f(glGetUniformLocation(mesh->shader->ID, "scale"), *mesh->scale);

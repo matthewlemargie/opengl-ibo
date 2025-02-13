@@ -20,7 +20,7 @@ GLContext::GLContext() : window(nullptr), monitor(nullptr), mode(nullptr) {
         return;
     }
     // Set GLFW window hints
-    unsigned int samples = 16;
+    unsigned int samples = 4;
     glfwWindowHint(GLFW_SAMPLES, samples);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);

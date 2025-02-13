@@ -1,24 +1,22 @@
 #version 460 core
 
 in vec3 fragNormal;
-in vec3 crntPos;
+in vec2 aTexCoord;  // Declare aTexCoord as input from vertex shader
 out vec4 FragColor;
-
-// uniform vec4 lightColor;
-// uniform vec3 lightPos;
 
 uniform sampler2D tex0;
 
 void main()
 {
+    // Calculate lighting (optional, you can add your own logic)
     vec3 normal = normalize(fragNormal);
-    vec3 lightDirection = normalize(lightPos - crntPos);
-    float dist = distance(lightPos, crntPos);
+    // Uncomment below lines to add lighting logic
+    // vec3 lightDirection = normalize(lightPos - crntPos);
+    // float diffuse = max(dot(normal, lightDirection), 0.0f);
 
-    // Calculate diffuse lighting
-    float diffuse = max(dot(normal, lightDirection), 0.0f);
-
-    // Set the fragment color
+    // Sample the texture and apply it to the fragment
     FragColor = texture(tex0, aTexCoord);
-    // FragColor = vec4(1.0f, 0.0f, 1.0f, 1.0f);
+    // Uncomment this line for a hardcoded color:
+    // FragColor = vec4(1.0f, 0.0f, 1.0f, 1.0f); 
 }
+

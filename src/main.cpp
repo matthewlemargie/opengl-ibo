@@ -10,18 +10,21 @@
 #include "OpenGL/Camera.h"
 #include "OpenGL/Scene.h"
 
-#include "chunk.h"
+#include "blocks.h"
 
 int main()
 {
-    Chunk chunk;
-
     double start = glfwGetTime();
+    // Init gl context before doing anything in gl (or else you get dreaded segmentation fault)
     GLContext glContext;
     Camera camera(&glContext, glm::vec3(4.0f, 0.0f, 0.0f), 60.0f, 1.0f, 5000.0f);
     Scene scene(&glContext);
     double timeToPrepare = glfwGetTime() - start;
     cout << "Scene prepared in " << timeToPrepare << "s" << endl;
+
+    Blocks world(&glContext);
+    std::vector<std::vector<GLfloat>> newBlockPositions = world.populateChunk();
+    world.addChunkToWorld(newBlockPositions);
 
     const double targetFPS = glContext.mode->refreshRate;
     const double frameTime = 1.0 / targetFPS;
@@ -33,7 +36,8 @@ int main()
 
         // rendering
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        scene.Render(&camera);
+        // scene.Render(&camera);
+        world.Render(camera);
         glfwSwapBuffers(glContext.window);
         glfwPollEvents();
 
