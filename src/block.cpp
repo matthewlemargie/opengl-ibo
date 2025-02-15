@@ -20,13 +20,13 @@ Block::Block(float& scale)
     modelAABB = AABB(scale * glm::vec3(-0.5f, -0.5f, -0.5f), scale * glm::vec3(0.5f, 0.5f, 0.5f));
 
     shader = new Shader("shaders/face_vert.glsl", "shaders/face_frag.glsl");
-    grass = new Texture("assets/textures/grass.jpg", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
+    atlas = new Texture("assets/textures/grass.jpg", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
     double timeDiff = glfwGetTime() - startTime;
     cout << "Block " << vao.ID << " initialized in " << timeDiff << "s" << endl;
 }
 
 Block::~Block() {
-    delete grass;
+    delete atlas;
     delete shader;
 }
 
@@ -39,8 +39,8 @@ void Block::addInstance(std::vector<glm::mat4> instanceMats) {
 }
 
 void Block::textureActivate(Camera& camera) {
-    grass->texUnit(*shader, "tex0", 0);
-    grass->Bind();
+    atlas->texUnit(*shader, "tex0", 0);
+    atlas->Bind();
 }
 
 void Block::drawCube() {

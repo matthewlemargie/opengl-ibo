@@ -75,7 +75,7 @@ struct Block {
     IBO ibo;
     std::vector<GLuint> ibos;
 
-    Texture* grass;
+    Texture* atlas;
     Shader* shader;
 
     float* scale;

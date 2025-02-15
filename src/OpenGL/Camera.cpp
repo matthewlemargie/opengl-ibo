@@ -30,13 +30,13 @@ FOVdeg(FOVdeg), nearPlane(nearPlane), farPlane(farPlane), mouseX(0.0f), mouseY(0
         -wNear, -hNear, -this->nearPlane,  -wFar,  -hFar,  -this->farPlane
     };
 
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)0);
-    glEnableVertexAttribArray(0);
+    // glGenVertexArrays(1, &VAO);
+    // glGenBuffers(1, &VBO);
+    // glBindVertexArray(VAO);
+    // glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    // glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
+    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)0);
+    // glEnableVertexAttribArray(0);
 
     startTime = glfwGetTime();
 
@@ -74,7 +74,7 @@ void Camera::Inputs()
 {
     endTime = glfwGetTime();
     timeDiff = endTime - startTime;
-    normalSpeed = 1.0f * (float)(60.0 * timeDiff);
+    normalSpeed = 0.25f * (float)(60.0 * timeDiff);
 	fastSpeed = 2.0f * normalSpeed;
     startTime = glfwGetTime();
 

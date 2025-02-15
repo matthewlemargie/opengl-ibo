@@ -1,7 +1,8 @@
 #include "Scene.h"
 
 Scene::Scene(struct GLContext* GLContext)
-: glContext(GLContext),  world(GLContext), wireframetoggler(GLContext->window), shader("shaders/default_vert.glsl", "shaders/default_frag.glsl"), lightShader("shaders/light_vert.glsl", "shaders/light_frag.glsl") 
+: glContext(GLContext) ,wireframetoggler(GLContext->window), 
+    shader("shaders/default_vert.glsl", "shaders/default_frag.glsl"), lightShader("shaders/light_vert.glsl", "shaders/light_frag.glsl") 
 {
     if (!GLContext) {
         std::cerr << "Error: GLContext is null!" << std::endl;
@@ -20,8 +21,8 @@ Scene::Scene(struct GLContext* GLContext)
     double loadStartTime = glfwGetTime();
 
     // Block* block = new Block(scale);
-    std::vector<std::vector<GLfloat>> newBlockPositions = world.populateChunk();
-    world.addChunkToWorld(newBlockPositions);
+    // std::vector<std::vector<GLfloat>> newBlockPositions = world.populateChunk();
+    // world.addChunkToWorld(newBlockPositions);
     for (int t = 0; t < numThreads; ++t) {
         int start = t * chunkSize;
         int end = (t == numThreads - 1) ? transforms.size() : (t + 1) * chunkSize; // Handle remainder in last thread
@@ -70,7 +71,7 @@ void Scene::Render(Camera* camera) {
     camera->updateMatrix();
 
 
-    skybox.Draw(camera);
+    // skybox.Draw(camera);
     wireframetoggler.toggleWireframe();
 
     if (wireframetoggler.wireframeMode)
@@ -78,7 +79,7 @@ void Scene::Render(Camera* camera) {
     else
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-    world.Render(*camera);
+    // world.Render(*camera);
     for (auto& mesh : meshes) {
         mesh->shader->Activate();
         glUniform1f(glGetUniformLocation(mesh->shader->ID, "scale"), *mesh->scale);

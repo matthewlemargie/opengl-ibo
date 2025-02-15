@@ -19,11 +19,11 @@
 
 struct Scene {
     GLContext* glContext;
-    World world;
+    // World world;
 
     std::set<Mesh*> meshes;
     std::set<Block*> blocks;
-    Skybox skybox;
+    // Skybox skybox;
 
     Shader shader;
     Shader lightShader;
