@@ -6,8 +6,8 @@ World::World(GLContext* context)
     shader = new Shader("shaders/block_vert.glsl", "shaders/block_frag.glsl");
     atlas = new Texture("assets/textures/grass.jpg", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
 
-    float vboBufferSize = TOTAL_BLOCKS_RENDERED * (5 * sizeof(GLfloat));
-    float eboBufferSize = TOTAL_BLOCKS_RENDERED * sizeof(GLuint);
+    float vboBufferSize = TOTAL_BLOCKS_RENDERED * (5 * 4 * 6 * sizeof(GLfloat));
+    float eboBufferSize = TOTAL_BLOCKS_RENDERED * (6 * 6 * sizeof(GLuint));
 
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);

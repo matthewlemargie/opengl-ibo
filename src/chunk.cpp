@@ -9,12 +9,17 @@ Chunk::~Chunk() {
 std::vector<GLuint> populateChunk() {
     std::vector<GLuint> newBlocks;
     auto start = std::chrono::high_resolution_clock::now();
-    for (int i = 0; i < CHUNK_TOTAL_BLOCKS; ++i) {
-        // choose blockID 
-        // need to create world generation function to put here
-        int newBlockID = GRASS;
+    for (int k = 0; k < CHUNK_X_DIM; ++k) {
+        for (int j = 0; j < CHUNK_Y_DIM; ++j) {
+            for (int i = 0; i < CHUNK_Z_DIM; ++i) {
+                // choose blockID 
+                // need to create world generation function to put here
+                
+                int newBlockID = GRASS;
 
-        newBlocks.push_back(newBlockID);
+                newBlocks.push_back(newBlockID);
+            }
+        }
     }
 
     auto end = std::chrono::high_resolution_clock::now();

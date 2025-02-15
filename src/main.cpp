@@ -20,7 +20,7 @@ int main()
     double start = glfwGetTime();
     // Init gl context before doing anything in gl (or else you get dreaded segmentation fault)
     GLContext glContext;
-    Camera camera(&glContext, glm::vec3(4.0f, 0.0f, 0.0f), 60.0f, 1.0f, 5000.0f);
+    Camera camera(&glContext, glm::vec3(8.0f, 17.0f, 8.0f), 60.0f, 1.0f, 1000.0f);
     // Scene scene(&glContext);
     double timeToPrepare = glfwGetTime() - start;
     cout << "Scene prepared in " << timeToPrepare << "s" << endl;

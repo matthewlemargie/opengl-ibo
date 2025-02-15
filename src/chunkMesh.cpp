@@ -50,6 +50,5 @@ std::pair<std::vector<GLfloat>, std::vector<GLuint>> chunkMesh::createMeshDataFr
             }
         }
     }
-
     return std::make_pair(vertices, indices);
 }
