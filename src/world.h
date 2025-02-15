@@ -21,7 +21,19 @@
 #include "AABB.h"
 #include "chunk.h"
 #include "constants.h"
+#include "chunk.h"
+#include "chunkMesh.h"
 
+#include <map>
+#include <utility>  // For std::pair
+#include <functional>  // For std::hash
+
+struct pair_hash {
+    template <class T1, class T2>
+    std::size_t operator()(const std::pair<T1, T2>& pair) const {
+        return std::hash<T1>()(pair.first) ^ (std::hash<T2>()(pair.second) << 1);
+    }
+};
 struct World {
     bool firstChunk = true;
 
@@ -29,14 +41,21 @@ struct World {
     GLuint vbo;
     GLuint ebo;
 
+    chunkMesh ChunkMesh;
+
     Texture* atlas;
     Shader* shader;
+
+    size_t currentVBOOffset = 0;
+    size_t currentEBOOffset = 0;
+
+    std::map<std::pair<int, int>, unsigned int> chunkIndexOffsets;
 
     World(GLContext* context);
     ~World();
 
     void textureActivate();
-    void addChunkMeshToWorld(std::vector<GLfloat> chunkVertices, std::vector<GLuint> chunkIndices);
+    void addChunkMeshToWorld(std::pair<int, int> posInWorld, std::vector<GLfloat> chunkVertices, std::vector<GLuint> chunkIndices);
     void addBlock(int blockID, int posInChunk, std::array<int,2> posInWorld);
     void deleteBlock(int posInChunk, std::array<int,2> posInWorld);
     void Render(Camera& camera);

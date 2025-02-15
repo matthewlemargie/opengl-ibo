@@ -23,6 +23,22 @@ World::World(GLContext* context)
     glEnableVertexAttribArray(1);
     glBindVertexArray(0);
 
+    chunkIndexOffsets.clear();  
+    currentVBOOffset = 0;
+    currentEBOOffset = 0;
+
+    std::vector<GLuint> chunk;
+    for (int i = 0; i < WORLD_X_DIM; ++i) {
+        for (int j = 0; j < WORLD_Z_DIM; ++j) {
+            std::pair<int, int> posInWorld = std::make_pair(i, j);
+            chunk = populateChunk();
+            auto meshData = ChunkMesh.createMeshDataFromChunk(posInWorld, chunk);
+            auto vertices = std::get<0>(meshData); 
+            auto indices = std::get<1>(meshData); 
+            addChunkMeshToWorld(posInWorld, vertices, indices);
+        }
+    }
+
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duration = end - start;
     cout << "world initialized in " << duration.count() << "s" << endl;
@@ -36,16 +52,36 @@ World::~World() {
     delete shader;
 }
 
-void World::addChunkMeshToWorld(std::vector<GLfloat> chunkVertices, std::vector<GLuint> chunkIndices) {
-    // posInWorld needed to know where in vbo/ebo to place vertices, indices
+void World::addChunkMeshToWorld(std::pair<int, int> posInWorld, std::vector<GLfloat> chunkVertices, std::vector<GLuint> chunkIndices) {
+    if (chunkVertices.empty() || chunkIndices.empty()) return;  // Ignore empty chunks
+
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, chunkVertices.size() * sizeof(GLfloat), chunkVertices.data(), GL_STATIC_DRAW);
+
+    // Store the offset where this chunk's vertices start
+    size_t vboOffsetBytes = currentVBOOffset * sizeof(GLfloat);
+    glBufferSubData(GL_ARRAY_BUFFER, vboOffsetBytes, chunkVertices.size() * sizeof(GLfloat), chunkVertices.data());
+
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, chunkIndices.size() * sizeof(GLuint), chunkIndices.data(), GL_STATIC_DRAW);
+    
+    // Store index offset before inserting new indices
+    size_t eboOffsetBytes = currentEBOOffset * sizeof(GLuint);
+    
+    // Adjust indices to reference the correct vertices
+    size_t baseVertexIndex = currentVBOOffset / 5;  // 5 floats per vertex
+    for (size_t i = 0; i < chunkIndices.size(); i++) {
+        chunkIndices[i] += baseVertexIndex;  // Offset indices to point to the correct vertices
+    }
+    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, eboOffsetBytes, chunkIndices.size() * sizeof(GLuint), chunkIndices.data());
+
+    // Store the index buffer offset for this chunk
+    chunkIndexOffsets[posInWorld] = currentEBOOffset;
+
+    // Update offsets for the next chunk
+    currentVBOOffset += chunkVertices.size();
+    currentEBOOffset += chunkIndices.size();
+
     glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 void World::addBlock(int blockID, int posInChunk, std::array<int, 2> posInWorld) {
@@ -64,8 +100,20 @@ void World::Render(Camera& camera) {
 
     textureActivate();
     glBindVertexArray(vao);
-    glDrawElements(GL_TRIANGLES, 6 * 6 * 4 * CHUNK_TOTAL_BLOCKS, GL_UNSIGNED_INT, 0);
 
+    // Convert chunk data into arrays for glMultiDrawElements
+    std::vector<GLsizei> indexCounts;
+    std::vector<void*> indexOffsets;
+
+    for (const auto& [pos, indexOffset] : chunkIndexOffsets) {
+        indexCounts.push_back(6 * 6 * CHUNK_TOTAL_BLOCKS);  // Indices per chunk
+        indexOffsets.push_back(reinterpret_cast<void*>(indexOffset * sizeof(GLuint)));
+    }
+
+    // Use glMultiDrawElements to batch draw all chunks
+    glMultiDrawElements(GL_TRIANGLES, indexCounts.data(), GL_UNSIGNED_INT, indexOffsets.data(), indexCounts.size());
+
+    glBindVertexArray(0);
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duration = end - start;
     // std::cout << "Entire render call took " << duration.count() << " s" << std::endl;

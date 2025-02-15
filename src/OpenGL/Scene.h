@@ -13,8 +13,6 @@
 #include "Ray.h"
 #include "Wireframe.h"
 #include "../ModelLoader.h"
-#include "../world.h"
-// #include "../block.h"
 #include "../GenerateRandoms.h"
 
 struct Scene {

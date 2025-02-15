@@ -24,7 +24,7 @@ std::vector<GLuint> populateChunk() {
 
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duration = end - start;
-    std::cout << "Chunk populated in " << duration.count() << " seconds" << std::endl;
+    // std::cout << "Chunk populated in " << duration.count() << " seconds" << std::endl;
 
     return newBlocks;
 }

@@ -54,7 +54,7 @@ struct chunkMesh {
         16, 17, 18, 18, 19, 16, // Face 4
         20, 21, 22, 22, 23, 20  // Face 5
     };
-    std::pair<std::vector<GLfloat>, std::vector<GLuint>> createMeshDataFromChunk(std::vector<GLuint> blocksByPosition);
+    std::pair<std::vector<GLfloat>, std::vector<GLuint>> createMeshDataFromChunk(std::pair<int, int> posInWorld, std::vector<GLuint> blocksByPosition);
 };
 
 

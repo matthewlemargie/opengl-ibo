@@ -1,6 +1,6 @@
 #include "chunkMesh.h"
 
-std::pair<std::vector<GLfloat>, std::vector<GLuint>> chunkMesh::createMeshDataFromChunk(std::vector<GLuint> blocksByPosition) {
+std::pair<std::vector<GLfloat>, std::vector<GLuint>> chunkMesh::createMeshDataFromChunk(std::pair<int, int> posInWorld, std::vector<GLuint> blocksByPosition) {
     std::vector<GLfloat> vertices;
     std::vector<GLuint> indices;
 
@@ -32,9 +32,9 @@ std::pair<std::vector<GLfloat>, std::vector<GLuint>> chunkMesh::createMeshDataFr
                         int vertexOffset = vertices.size() / 5; // Each vertex has (x, y, z, u, v)
 
                         for (int j = 0; j < 4; ++j) {
-                            vertices.push_back(cubeVertices[face * 12 + j * 3] + x);
+                            vertices.push_back(cubeVertices[face * 12 + j * 3] + x + (CHUNK_X_DIM * std::get<0>(posInWorld)));
                             vertices.push_back(cubeVertices[face * 12 + j * 3 + 1] + y);
-                            vertices.push_back(cubeVertices[face * 12 + j * 3 + 2] + z);
+                            vertices.push_back(cubeVertices[face * 12 + j * 3 + 2] + z + (CHUNK_Z_DIM * std::get<1>(posInWorld)));
                             vertices.push_back(blockTexCoords[face * 8 + j * 2]);
                             vertices.push_back(blockTexCoords[face * 8 + j * 2 + 1]);
                         }
