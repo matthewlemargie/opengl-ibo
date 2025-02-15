@@ -6,8 +6,8 @@ World::World(GLContext* context)
     shader = new Shader("shaders/block_vert.glsl", "shaders/block_frag.glsl");
     atlas = new Texture("assets/textures/grass.jpg", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
 
-    float vboBufferSize = 10000 * TOTAL_BLOCKS_RENDERED * (3 * sizeof(GLfloat));
-    float eboBufferSize = 10000 * TOTAL_BLOCKS_RENDERED * sizeof(GLuint);
+    float vboBufferSize = TOTAL_BLOCKS_RENDERED * (5 * sizeof(GLfloat));
+    float eboBufferSize = TOTAL_BLOCKS_RENDERED * sizeof(GLuint);
 
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
@@ -40,9 +40,9 @@ void World::addChunkMeshToWorld(std::vector<GLfloat> chunkVertices, std::vector<
     // posInWorld needed to know where in vbo/ebo to place vertices, indices
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, chunkVertices.size(), chunkVertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, chunkVertices.size() * sizeof(GLfloat), chunkVertices.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, chunkIndices.size(), chunkIndices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, chunkIndices.size() * sizeof(GLuint), chunkIndices.data(), GL_STATIC_DRAW);
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -64,7 +64,7 @@ void World::Render(Camera& camera) {
 
     textureActivate();
     glBindVertexArray(vao);
-    glDrawElements(GL_TRIANGLES, 16 * 16 * 6 * 6, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 6 * 6 * 4 * CHUNK_TOTAL_BLOCKS, GL_UNSIGNED_INT, 0);
 
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duration = end - start;
