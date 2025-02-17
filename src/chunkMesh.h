@@ -17,42 +17,78 @@ struct Direction {
 struct chunkMesh {
 
     std::vector<GLfloat> cubeVertices = { 
-        // Face 0: Front (z = +0.5)
-        -0.5f, -0.5f,  0.5f,   0.5f, -0.5f,  0.5f,   0.5f,  0.5f,  0.5f,   -0.5f,  0.5f,  0.5f,
-        // Face 1: Back (z = -0.5)
-        -0.5f, -0.5f, -0.5f,   0.5f, -0.5f, -0.5f,   0.5f,  0.5f, -0.5f,   -0.5f,  0.5f, -0.5f,
-        // Face 2: Right (x = +0.5)
-        0.5f, -0.5f, -0.5f,   0.5f, -0.5f,  0.5f,   0.5f,  0.5f,  0.5f,    0.5f,  0.5f, -0.5f,
-        // Face 3: Left (x = -0.5)
-        -0.5f, -0.5f, -0.5f,  -0.5f, -0.5f,  0.5f,  -0.5f,  0.5f,  0.5f,   -0.5f,  0.5f, -0.5f,
-        // Face 4: Top (y = +0.5)
-        -0.5f,  0.5f, -0.5f,  -0.5f,  0.5f,  0.5f,   0.5f,  0.5f,  0.5f,    0.5f,  0.5f, -0.5f,
-        // Face 5: Bottom (y = -0.5)
-        -0.5f, -0.5f, -0.5f,  -0.5f, -0.5f,  0.5f,   0.5f, -0.5f,  0.5f,    0.5f, -0.5f, -0.5f
+        // North
+        1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 0.0f,
+        1.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+        // South
+        0.0f, 0.0f, 1.0f,
+        1.0f, 0.0f, 1.0f,
+        0.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f,
+        // West
+        0.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 1.0f,
+        // East
+        1.0f, 0.0f, 1.0f,
+        1.0f, 0.0f, 0.0f,
+        1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 0.0f,
+        // Bottom
+        1.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+        1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 0.0f,
+        // Top
+        0.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f,
+        0.0f, 1.0f, 0.0f,
+        1.0f, 1.0f, 0.0f
     };
 
     std::vector<GLfloat> blockTexCoords = { 
-        // Face 0
-        0.0f, 0.0f,  1.0f, 0.0f,  1.0f, 1.0f,  0.0f, 1.0f,
-        // Face 1
-        1.0f, 0.0f,  0.0f, 0.0f,  0.0f, 1.0f,  1.0f, 1.0f,
-        // Face 2
-        0.0f, 0.0f,  1.0f, 0.0f,  1.0f, 1.0f,  0.0f, 1.0f,
-        // Face 3
-        1.0f, 0.0f,  0.0f, 0.0f,  0.0f, 1.0f,  1.0f, 1.0f,
-        // Face 4
-        0.0f, 0.0f,  0.0f, 1.0f,  1.0f, 1.0f,  1.0f, 0.0f,
-        // Face 5
-        1.0f, 1.0f,  1.0f, 0.0f,  0.0f, 0.0f,  0.0f, 1.0f
+        // North
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+        // South
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+        // West
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+        // East
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+        // Bottom
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+        // Top
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        0.0f, 1.0f,
+        1.0f, 1.0f,
     };
 
     std::vector<GLuint> cubeIndices = { 
-        0, 1, 2,  2, 3, 0,  // Face 0
-        4, 5, 6,  6, 7, 4,  // Face 1
-        8, 9, 10, 10, 11, 8, // Face 2
-        12, 13, 14, 14, 15, 12, // Face 3
-        16, 17, 18, 18, 19, 16, // Face 4
-        20, 21, 22, 22, 23, 20  // Face 5
+        0, 3, 1,  0, 2, 3,  // North
+        4, 7, 5,  4, 6, 7,  // South
+        8, 11, 9, 8, 10, 11, // West
+        12, 15, 13, 12, 14, 15, // East
+        16, 19, 17, 16, 18, 19, // Bottom
+        20, 23, 21, 20, 22, 23  // Top
     };
     std::pair<std::vector<GLfloat>, std::vector<GLuint>> createMeshDataFromChunk(std::pair<int, int> posInWorld, std::vector<GLuint> blocksByPosition);
 };

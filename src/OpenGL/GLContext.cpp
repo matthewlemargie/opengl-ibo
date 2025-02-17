@@ -20,7 +20,7 @@ GLContext::GLContext() : window(nullptr), monitor(nullptr), mode(nullptr) {
         return;
     }
     // Set GLFW window hints
-    unsigned int samples = 4;
+    unsigned int samples = 1;
     glfwWindowHint(GLFW_SAMPLES, samples);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -51,9 +51,9 @@ GLContext::GLContext() : window(nullptr), monitor(nullptr), mode(nullptr) {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
     glDepthFunc(GL_LESS);
-    // glEnable(GL_CULL_FACE);  // Enable face culling
-    // glCullFace(GL_FRONT);      // Cull back faces (default)
-    // glFrontFace(GL_CCW);      // Define front faces as counterclockwise (CCW)
+    glEnable(GL_CULL_FACE);  // Enable face culling
+    glCullFace(GL_BACK);      // Cull back faces (default)
+    glFrontFace(GL_CW);      // Define front faces as counterclockwise (CCW)
 
     glfwSwapInterval(0);
 

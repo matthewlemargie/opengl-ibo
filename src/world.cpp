@@ -23,7 +23,6 @@ World::World(GLContext* context)
     glEnableVertexAttribArray(1);
     glBindVertexArray(0);
 
-    chunkIndexOffsets.clear();  
     currentVBOOffset = 0;
     currentEBOOffset = 0;
 

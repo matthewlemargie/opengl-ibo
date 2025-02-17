@@ -21,7 +21,7 @@ struct Camera
 
 	glm::vec3 Position;
 	glm::vec3 initialPosition;
-	glm::vec3 Orientation = glm::vec3(-1.0f, 0.0f, 0.0f);
+	glm::vec3 Orientation = glm::vec3(0.0f, 0.0f, 1.0f);
 	glm::vec3 initialOrientation = glm::vec3(-1.0f, 0.0f, 0.0f);
 	glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
 
