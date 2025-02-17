@@ -57,10 +57,8 @@ int main()
         ImGui::Begin("Variable Viewer");
         ImGui::Text("Camera position: %.3f, %.3f, %.3f", camera.Position.x, camera.Position.y, camera.Position.z);
         ImGui::Text("Camera orientation: %.3f, %.3f, %.3f", camera.Orientation.x, camera.Orientation.y, camera.Orientation.z);
-        // TODO: not getting true FPS here
         ImGui::Text("Framerate: %.3f", glContext.fpsCounter.FPS);
         ImGui::Checkbox("VSync", &vsync);
-        
         ImGui::End();  // End the window
 
         // Render ImGui draw data
