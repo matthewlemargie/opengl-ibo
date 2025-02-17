@@ -51,9 +51,9 @@ GLContext::GLContext() : window(nullptr), monitor(nullptr), mode(nullptr) {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
     glDepthFunc(GL_LESS);
-    glEnable(GL_CULL_FACE);  // Enable face culling
-    glCullFace(GL_BACK);      // Cull back faces (default)
-    glFrontFace(GL_CW);      // Define front faces as counterclockwise (CCW)
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CW);
 
     glfwSwapInterval(0);
 

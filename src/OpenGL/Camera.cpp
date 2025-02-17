@@ -78,85 +78,97 @@ void Camera::Inputs()
 	fastSpeed = 2.0f * normalSpeed;
     startTime = glfwGetTime();
 
-	if (glfwGetKey(glContext->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-	{
-		speed = fastSpeed;
-	}
-	else if (glfwGetKey(glContext->window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
-	{
-		speed = normalSpeed;
-	}
+    if (glfwGetKey(glContext->window, GLFW_KEY_ESCAPE) == GLFW_PRESS && !firstEscapeClick) {
+        glfwSetInputMode(glContext->window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+        escapeMode = !escapeMode;
+        firstEscapeClick = true;
+    }
+    if (glfwGetKey(glContext->window, GLFW_KEY_ESCAPE) == GLFW_RELEASE) {
+        firstEscapeClick = false;
+    }
 
-	if (glfwGetKey(glContext->window, GLFW_KEY_W) == GLFW_PRESS)
-	{
-		Position += speed * Orientation;
-	}
-	if (glfwGetKey(glContext->window, GLFW_KEY_A) == GLFW_PRESS)
-	{
-		Position += speed * -glm::normalize(glm::cross(Orientation, Up));
-	}
-	if (glfwGetKey(glContext->window, GLFW_KEY_S) == GLFW_PRESS)
-	{
-		Position += speed * -Orientation;
-	}
-	if (glfwGetKey(glContext->window, GLFW_KEY_D) == GLFW_PRESS)
-	{
-		Position += speed * glm::normalize(glm::cross(Orientation, Up));
-	}
-	if (glfwGetKey(glContext->window, GLFW_KEY_SPACE) == GLFW_PRESS)
-	{
-		Position += speed * Up;
-	}
-	if (glfwGetKey(glContext->window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-	{
-		Position += speed * -Up;
-	}
-	if (glfwGetKey(glContext->window, GLFW_KEY_O) == GLFW_PRESS)
-	{
-		Position = initialPosition;
-		Orientation = initialOrientation;
-	}
+    if (!escapeMode) {
+        if (glfwGetKey(glContext->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        {
+            speed = fastSpeed;
+        }
+        else if (glfwGetKey(glContext->window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
+        {
+            speed = normalSpeed;
+        }
 
-	double lastX = width / 2.0, lastY = height / 2.0;
+        if (glfwGetKey(glContext->window, GLFW_KEY_W) == GLFW_PRESS)
+        {
+            Position += speed * Orientation;
+        }
+        if (glfwGetKey(glContext->window, GLFW_KEY_A) == GLFW_PRESS)
+        {
+            Position += speed * -glm::normalize(glm::cross(Orientation, Up));
+        }
+        if (glfwGetKey(glContext->window, GLFW_KEY_S) == GLFW_PRESS)
+        {
+            Position += speed * -Orientation;
+        }
+        if (glfwGetKey(glContext->window, GLFW_KEY_D) == GLFW_PRESS)
+        {
+            Position += speed * glm::normalize(glm::cross(Orientation, Up));
+        }
+        if (glfwGetKey(glContext->window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        {
+            Position += speed * Up;
+        }
+        if (glfwGetKey(glContext->window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+        {
+            Position += speed * -Up;
+        }
+        if (glfwGetKey(glContext->window, GLFW_KEY_O) == GLFW_PRESS)
+        {
+            Position = initialPosition;
+            Orientation = initialOrientation;
+        }
 
-	if (glfwGetMouseButton(glContext->window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-	{
-		glfwSetInputMode(glContext->window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+        double lastX = width / 2.0, lastY = height / 2.0;
 
-		if (firstClick)
-		{
-			// Set the cursor position to the center of the screen only once
-			glfwSetCursorPos(glContext->window, (float)width / 2.0f, (float)height / 2.0f);
-			firstClick = false;
-		}
-		
-		// Get the current mouse position
-		glfwGetCursorPos(glContext->window, &mouseX, &mouseY);
 
-		// Calculate the difference in mouse movement since the last frame
-		float rotX = sensitivity * (float)(mouseY - lastY) / height;
-		float rotY = sensitivity * (float)(mouseX - lastX) / width;  // Consider the width for X rotation
+        if (glfwGetMouseButton(glContext->window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+        {
+            glfwSetInputMode(glContext->window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
-		// Update the rotation based on the movement
-		glm::vec3 newOrientation = glm::rotate(Orientation, glm::radians(-rotX), glm::normalize(glm::cross(Orientation, Up)));
-		if (!(glm::angle(newOrientation, Up) <= glm::radians(5.0f) || glm::angle(newOrientation, -Up) <= glm::radians(5.0f)))
-		{
-			Orientation = newOrientation;
-		}
+            if (firstClick)
+            {
+                // Set the cursor position to the center of the screen only once
+                glfwSetCursorPos(glContext->window, (float)width / 2.0f, (float)height / 2.0f);
+                firstClick = false;
+            }
+            
+            // Get the current mouse position
+            glfwGetCursorPos(glContext->window, &mouseX, &mouseY);
 
-		// Apply Y-axis rotation
-		Orientation = glm::rotate(Orientation, glm::radians(-rotY), Up);
+            // Calculate the difference in mouse movement since the last frame
+            float rotX = sensitivity * (float)(mouseY - lastY) / height;
+            float rotY = sensitivity * (float)(mouseX - lastX) / width;  // Consider the width for X rotation
 
-		// Save the current mouse position for the next frame
-		lastX = mouseX;
-		lastY = mouseY;
+            // Update the rotation based on the movement
+            glm::vec3 newOrientation = glm::rotate(Orientation, glm::radians(-rotX), glm::normalize(glm::cross(Orientation, Up)));
+            if (!(glm::angle(newOrientation, Up) <= glm::radians(5.0f) || glm::angle(newOrientation, -Up) <= glm::radians(5.0f)))
+            {
+                Orientation = newOrientation;
+            }
 
-		// Reset cursor position to center for the next frame
-		glfwSetCursorPos(glContext->window, (float)width / 2.0f, (float)height / 2.0f);
-	}
-	else if (glfwGetMouseButton(glContext->window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
-	{
-		glfwSetInputMode(glContext->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-		firstClick = true;
-	}
+            // Apply Y-axis rotation
+            Orientation = glm::rotate(Orientation, glm::radians(-rotY), Up);
+
+            // Save the current mouse position for the next frame
+            lastX = mouseX;
+            lastY = mouseY;
+
+            // Reset cursor position to center for the next frame
+            glfwSetCursorPos(glContext->window, (float)width / 2.0f, (float)height / 2.0f);
+        }
+        else if (glfwGetMouseButton(glContext->window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
+        {
+            glfwSetInputMode(glContext->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            firstClick = true;
+        }
+    }
 }

@@ -6,8 +6,8 @@ void FPSCounter::outputFPS() {
     currTime = glfwGetTime();
     timeDiff = currTime - prevTime;
     counter++;
-    if (timeDiff >= 1.0 / 30.0) {
-        double FPS = (1.0 / timeDiff) * counter;
+    if (timeDiff >= 1.0 / 10.0) {
+        FPS = (1.0 / timeDiff) * counter;
         std::cout << "FPS: " << FPS << std::endl;
         prevTime = currTime;
         counter = 0;

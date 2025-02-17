@@ -1,4 +1,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
+#include "imgui.h"
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl3.h"
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
@@ -27,24 +30,50 @@ int main()
     const double targetFPS = glContext.mode->refreshRate;
     const double frameTime = 1.0 / targetFPS;
     WireframeToggler wf(glContext.window);
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGui::StyleColorsDark();  // Optional: change theme
+
+    // Setup Platform/Renderer bindings
+    ImGui_ImplGlfw_InitForOpenGL(glContext.window, true);
+    ImGui_ImplOpenGL3_Init("#version 130");
+
+    bool vsync = true;
 
     while (glContext.isWindowOpen())
     {
         auto startTime = std::chrono::high_resolution_clock::now();
-        // glContext.fpsCounter.outputFPS();
+        glContext.fpsCounter.outputFPS();
 
         // rendering
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
         wf.toggleWireframe();
         world.Render(camera);
+        // Create a window and display variables
+        ImGui::Begin("Variable Viewer");
+        ImGui::Text("Camera position: %.3f, %.3f, %.3f", camera.Position.x, camera.Position.y, camera.Position.z);
+        ImGui::Text("Camera orientation: %.3f, %.3f, %.3f", camera.Orientation.x, camera.Orientation.y, camera.Orientation.z);
+        // TODO: not getting true FPS here
+        ImGui::Text("Framerate: %.3f", glContext.fpsCounter.FPS);
+        ImGui::Checkbox("VSync", &vsync);
+        
+        ImGui::End();  // End the window
+
+        // Render ImGui draw data
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
         glfwSwapBuffers(glContext.window);
         glfwPollEvents();
-
         // Limit FPS
         auto endTime = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = endTime - startTime;
         double sleepTime = frameTime - elapsed.count();
-        if (sleepTime > 0) {
+        if (sleepTime > 0 && vsync) {
             std::this_thread::sleep_for(std::chrono::duration<double>(sleepTime));
         }
     }

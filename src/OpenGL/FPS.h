@@ -10,6 +10,7 @@ struct FPSCounter {
     double prevTime = 0.0;
     double currTime = 0.0;
     double timeDiff;
+    double FPS;
     unsigned int counter = 0;
 
     void outputFPS();

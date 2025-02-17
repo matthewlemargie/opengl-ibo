@@ -23,4 +23,4 @@ include_directories(
 add_executable(main ${SRC_FILES})
 
 # Link the library (e.g., static or shared)
-target_link_libraries(main PRIVATE glfw GLEW GL)
+target_link_libraries(main PRIVATE imgui glfw GLEW GL)
