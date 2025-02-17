@@ -4,6 +4,7 @@ Camera::Camera(GLContext* glContext, glm::vec3 position, float FOVdeg, float nea
 : glContext(glContext), width(glContext->mode->width), height(glContext->mode->height),Position(position), initialPosition(position),
 FOVdeg(FOVdeg), nearPlane(nearPlane), farPlane(farPlane), mouseX(0.0f), mouseY(0.0f), frustumShader("shaders/ray_vert.glsl", "shaders/ray_frag.glsl")
 {
+    glfwSetInputMode(glContext->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	hNear = this->nearPlane * tan(glm::radians(this->FOVdeg / 2.0f));
 	wNear = hNear * ((float)width / height);
@@ -74,13 +75,16 @@ void Camera::Inputs()
 {
     endTime = glfwGetTime();
     timeDiff = endTime - startTime;
-    normalSpeed = 0.25f * (float)(60.0 * timeDiff);
+    normalSpeed = 0.1f * (float)(60.0 * timeDiff);
 	fastSpeed = 2.0f * normalSpeed;
     startTime = glfwGetTime();
 
     if (glfwGetKey(glContext->window, GLFW_KEY_ESCAPE) == GLFW_PRESS && !firstEscapeClick) {
-        glfwSetInputMode(glContext->window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
         escapeMode = !escapeMode;
+        if (escapeMode)
+            glfwSetInputMode(glContext->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        else
+            glfwSetInputMode(glContext->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         firstEscapeClick = true;
     }
     if (glfwGetKey(glContext->window, GLFW_KEY_ESCAPE) == GLFW_RELEASE) {
@@ -127,48 +131,25 @@ void Camera::Inputs()
             Orientation = initialOrientation;
         }
 
-        double lastX = width / 2.0, lastY = height / 2.0;
+        // Get the current mouse position
+        glfwGetCursorPos(glContext->window, &mouseX, &mouseY);
 
+        // Calculate the difference in mouse movement since the last frame
+        float rotX = sensitivity * (float)(mouseY - height / 2.0) / height;
+        float rotY = sensitivity * (float)(mouseX - width / 2.0) / width;
 
-        if (glfwGetMouseButton(glContext->window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+        // Update the rotation based on the movement
+        glm::vec3 newOrientation = glm::rotate(Orientation, glm::radians(-rotX), glm::normalize(glm::cross(Orientation, Up)));
+        if (!(glm::angle(newOrientation, Up) <= glm::radians(5.0f) || glm::angle(newOrientation, -Up) <= glm::radians(5.0f)))
         {
-            glfwSetInputMode(glContext->window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-
-            if (firstClick)
-            {
-                // Set the cursor position to the center of the screen only once
-                glfwSetCursorPos(glContext->window, (float)width / 2.0f, (float)height / 2.0f);
-                firstClick = false;
-            }
-            
-            // Get the current mouse position
-            glfwGetCursorPos(glContext->window, &mouseX, &mouseY);
-
-            // Calculate the difference in mouse movement since the last frame
-            float rotX = sensitivity * (float)(mouseY - lastY) / height;
-            float rotY = sensitivity * (float)(mouseX - lastX) / width;  // Consider the width for X rotation
-
-            // Update the rotation based on the movement
-            glm::vec3 newOrientation = glm::rotate(Orientation, glm::radians(-rotX), glm::normalize(glm::cross(Orientation, Up)));
-            if (!(glm::angle(newOrientation, Up) <= glm::radians(5.0f) || glm::angle(newOrientation, -Up) <= glm::radians(5.0f)))
-            {
-                Orientation = newOrientation;
-            }
-
-            // Apply Y-axis rotation
-            Orientation = glm::rotate(Orientation, glm::radians(-rotY), Up);
-
-            // Save the current mouse position for the next frame
-            lastX = mouseX;
-            lastY = mouseY;
-
-            // Reset cursor position to center for the next frame
-            glfwSetCursorPos(glContext->window, (float)width / 2.0f, (float)height / 2.0f);
+            Orientation = newOrientation;
         }
-        else if (glfwGetMouseButton(glContext->window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
-        {
-            glfwSetInputMode(glContext->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-            firstClick = true;
-        }
+
+        // Apply Y-axis rotation
+        Orientation = glm::rotate(Orientation, glm::radians(-rotY), Up);
+
+        // Reset cursor position to center for the next frame
+        glfwSetCursorPos(glContext->window, (float)width / 2.0f, (float)height / 2.0f);
+
     }
 }

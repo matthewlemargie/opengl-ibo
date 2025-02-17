@@ -37,7 +37,7 @@ GLContext::GLContext() : window(nullptr), monitor(nullptr), mode(nullptr) {
 
     glfwMakeContextCurrent(window);
     glViewport(0, 0, mode->width, mode->height);
-    glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+    // glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
     glewExperimental = GL_TRUE;
     // Initialize GLEW
