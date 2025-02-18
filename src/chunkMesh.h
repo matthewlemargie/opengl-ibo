@@ -1,6 +1,7 @@
 #ifndef CHUNKMESH_H
 #define CHUNKMESH_H
 
+#include <glm/glm.hpp>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <GL/gl.h>
@@ -90,7 +91,7 @@ struct chunkMesh {
         16, 19, 17, 16, 18, 19, // Bottom
         20, 23, 21, 20, 22, 23  // Top
     };
-    std::pair<std::vector<GLfloat>, std::vector<GLuint>> createMeshDataFromChunk(int xPos, int zPos, std::vector<GLuint> blocksByPosition);
+    std::pair<std::vector<BlockVertex>, std::vector<GLuint>> createMeshDataFromChunk(int xPos, int zPos, std::vector<GLuint> blocksByPosition);
 };
 
 

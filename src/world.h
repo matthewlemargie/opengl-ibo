@@ -51,7 +51,7 @@ struct World {
     ~World();
 
     void textureActivate();
-    void addChunkMeshToWorld(int xPos, int zPos, std::vector<GLfloat> chunkVertices, std::vector<GLuint> chunkIndices);
+    void addChunkMeshToWorld(int xPos, int zPos, std::vector<BlockVertex> chunkVertices, std::vector<GLuint> chunkIndices);
     void addBlock(int blockID, int posInChunk, std::array<int,2> posInWorld);
     void deleteBlock(int posInChunk, std::array<int,2> posInWorld);
     void Render(Camera& camera);

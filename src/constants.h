@@ -1,8 +1,10 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+#include <glm/glm.hpp>
+
 constexpr int CHUNK_X_DIM = 16;
-constexpr int CHUNK_Y_DIM = 64;
+constexpr int CHUNK_Y_DIM = 32;
 constexpr int CHUNK_Z_DIM = 16;
 constexpr int CHUNK_TOTAL_BLOCKS = CHUNK_X_DIM * CHUNK_Y_DIM * CHUNK_Z_DIM;
 
@@ -17,5 +19,12 @@ enum BlockID {
     GRASS,
     BLOCKID_COUNT,
 };
+
+struct BlockVertex {
+    glm::vec3 position;
+    glm::vec2 texCoord;
+    char direction;
+};
+
 
 #endif

@@ -8,7 +8,7 @@ void FPSCounter::outputFPS() {
     counter++;
     if (timeDiff >= 1.0 / 10.0) {
         FPS = (1.0 / timeDiff) * counter;
-        std::cout << "FPS: " << FPS << std::endl;
+        // std::cout << "FPS: " << FPS << std::endl;
         prevTime = currTime;
         counter = 0;
     }
