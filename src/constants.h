@@ -2,7 +2,7 @@
 #define CONSTANTS_H
 
 constexpr int CHUNK_X_DIM = 16;
-constexpr int CHUNK_Y_DIM = 16;
+constexpr int CHUNK_Y_DIM = 64;
 constexpr int CHUNK_Z_DIM = 16;
 constexpr int CHUNK_TOTAL_BLOCKS = CHUNK_X_DIM * CHUNK_Y_DIM * CHUNK_Z_DIM;
 

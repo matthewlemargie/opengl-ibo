@@ -37,21 +37,16 @@ struct pair_hash {
 struct World {
     bool firstChunk = true;
 
-    GLuint vao;
-    GLuint vbo;
-    GLuint ebo;
+    std::unordered_map<std::pair<int, int>, GLuint, pair_hash> chunkVAOs;
+    std::unordered_map<std::pair<int, int>, GLuint, pair_hash> chunkVBOs;
+    std::unordered_map<std::pair<int, int>, GLuint, pair_hash> chunkEBOs;
+    std::unordered_map<std::pair<int, int>, size_t, pair_hash> chunkIndexCounts;
 
     chunkMesh ChunkMesh;
     Chunk chunkmaker;
 
     Texture* atlas;
     Shader* shader;
-
-    size_t currentVBOOffset = 0;
-    size_t currentEBOOffset = 0;
-
-    std::map<std::pair<int, int>, unsigned int> chunkIndexOffsets;
-
     World(GLContext* context);
     ~World();
 

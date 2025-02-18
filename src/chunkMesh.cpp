@@ -25,6 +25,7 @@ std::pair<std::vector<GLfloat>, std::vector<GLuint>> chunkMesh::createMeshDataFr
                     int ny = y + dirs[face].yOffset;
                     int nz = z + dirs[face].zOffset;
 
+                    if (ny < 1) continue;
                     bool isOutOfBounds = nx < 0 || ny < 0 || nz < 0 || nx >= CHUNK_X_DIM || ny >= CHUNK_Y_DIM || nz >= CHUNK_Z_DIM;
                     int neighborIndex = nx + (ny * CHUNK_X_DIM) + (nz * CHUNK_X_DIM * CHUNK_Y_DIM);
 
