@@ -77,16 +77,41 @@ void World::textureActivate() {
 }
 
 void World::Render(Camera& camera) {
+    // frustum culling
+
     auto start = std::chrono::high_resolution_clock::now();
     shader->Activate();
     camera.Inputs();
     camera.updateMatrix();
     camera.Matrix(*shader, "camMatrix");
 
+    frustum.update(camera);
     textureActivate();
     for (auto& [pos, vao] : chunkVAOs) {
-        glBindVertexArray(vao);
-        glDrawElements(GL_TRIANGLES, chunkIndexCounts[pos], GL_UNSIGNED_INT, 0);
+        // Offsets to center the world
+        float worldOffsetX = (WORLD_X_DIM * CHUNK_X_DIM) / 2.0f;
+        float worldOffsetZ = (WORLD_Z_DIM * CHUNK_Z_DIM) / 2.0f;
+
+        // Assume pos is stored as (x, z)
+        int xPos = std::get<0>(pos);
+        int zPos = std::get<1>(pos);
+
+        glm::vec3 min = {
+            (float)(xPos * CHUNK_X_DIM) - worldOffsetX,
+            0.0f,
+            (float)(zPos * CHUNK_Z_DIM) - worldOffsetZ
+        };
+
+        glm::vec3 max = {
+            (float)((xPos + 1) * CHUNK_X_DIM) - worldOffsetX,
+            CHUNK_Y_DIM,
+            (float)((zPos + 1) * CHUNK_Z_DIM) - worldOffsetZ
+        };
+
+        if (frustum.intersectsAABB(min, max)) {
+            glBindVertexArray(vao);
+            glDrawElements(GL_TRIANGLES, chunkIndexCounts[pos], GL_UNSIGNED_INT, 0);
+        }
     }
 
     glBindVertexArray(0);

@@ -36,6 +36,7 @@ struct pair_hash {
 };
 struct World {
     bool firstChunk = true;
+    Frustum frustum;
 
     std::unordered_map<std::pair<int, int>, GLuint, pair_hash> chunkVAOs;
     std::unordered_map<std::pair<int, int>, GLuint, pair_hash> chunkVBOs;

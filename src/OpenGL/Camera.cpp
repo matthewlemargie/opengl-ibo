@@ -153,3 +153,89 @@ void Camera::Inputs()
 
     }
 }
+
+void Frustum::update(const Camera& camera) {
+    // Calculate projection and view matrices
+
+    // Combine the view and projection matrices
+    glm::mat4 vpMatrix = camera.projection * camera.view;
+
+    // Extract the frustum planes from the view-projection matrix
+    extractFrustumPlanes(vpMatrix);
+}
+
+void Frustum::extractFrustumPlanes(const glm::mat4& vpMatrix) {
+    // Left plane:  = vpMatrix[0][3] + vpMatrix[0][0], vpMatrix[1][3] + vpMatrix[1][0], vpMatrix[2][3] + vpMatrix[2][0], vpMatrix[3][3] + vpMatrix[3][0]
+    planes[0].normal.x = vpMatrix[0][3] + vpMatrix[0][0];
+    planes[0].normal.y = vpMatrix[1][3] + vpMatrix[1][0];
+    planes[0].normal.z = vpMatrix[2][3] + vpMatrix[2][0];
+    planes[0].distance = vpMatrix[3][3] + vpMatrix[3][0];
+
+    // Right plane: = vpMatrix[0][3] - vpMatrix[0][0], etc.
+    planes[1].normal.x = vpMatrix[0][3] - vpMatrix[0][0];
+    planes[1].normal.y = vpMatrix[1][3] - vpMatrix[1][0];
+    planes[1].normal.z = vpMatrix[2][3] - vpMatrix[2][0];
+    planes[1].distance = vpMatrix[3][3] - vpMatrix[3][0];
+
+    // Top plane: = vpMatrix[0][3] - vpMatrix[0][1], etc.
+    planes[2].normal.x = vpMatrix[0][3] - vpMatrix[0][1];
+    planes[2].normal.y = vpMatrix[1][3] - vpMatrix[1][1];
+    planes[2].normal.z = vpMatrix[2][3] - vpMatrix[2][1];
+    planes[2].distance = vpMatrix[3][3] - vpMatrix[3][1];
+
+    // Bottom plane: = vpMatrix[0][3] + vpMatrix[0][1], etc.
+    planes[3].normal.x = vpMatrix[0][3] + vpMatrix[0][1];
+    planes[3].normal.y = vpMatrix[1][3] + vpMatrix[1][1];
+    planes[3].normal.z = vpMatrix[2][3] + vpMatrix[2][1];
+    planes[3].distance = vpMatrix[3][3] + vpMatrix[3][1];
+
+    // Near plane: = vpMatrix[0][3] + vpMatrix[0][2], etc.
+    planes[4].normal.x = vpMatrix[0][3] + vpMatrix[0][2];
+    planes[4].normal.y = vpMatrix[1][3] + vpMatrix[1][2];
+    planes[4].normal.z = vpMatrix[2][3] + vpMatrix[2][2];
+    planes[4].distance = vpMatrix[3][3] + vpMatrix[3][2];
+
+    // Far plane: = vpMatrix[0][3] - vpMatrix[0][2], etc.
+    planes[5].normal.x = vpMatrix[0][3] - vpMatrix[0][2];
+    planes[5].normal.y = vpMatrix[1][3] - vpMatrix[1][2];
+    planes[5].normal.z = vpMatrix[2][3] - vpMatrix[2][2];
+    planes[5].distance = vpMatrix[3][3] - vpMatrix[3][2];
+
+    // Normalize each plane
+    for (int i = 0; i < 6; i++) {
+        float len = glm::length(planes[i].normal);
+        planes[i].normal /= len;
+        planes[i].distance /= len;
+    }
+}
+
+bool Frustum::pointInFrustum(const glm::vec3& point) const {
+    for (const auto& plane : planes) {
+        if (glm::dot(plane.normal, point) + plane.distance < 0)
+            return false;
+    }
+    return true;
+}
+
+// Function to check if an AABB intersects the frustum
+bool Frustum::intersectsAABB(const glm::vec3& min, const glm::vec3& max) const {
+    for (const auto& plane : planes) {
+        // Select the positive and negative vertex for the plane
+        glm::vec3 positive(
+            plane.normal.x >= 0 ? max.x : min.x,
+            plane.normal.y >= 0 ? max.y : min.y,
+            plane.normal.z >= 0 ? max.z : min.z
+        );
+
+        glm::vec3 negative(
+            plane.normal.x >= 0 ? min.x : max.x,
+            plane.normal.y >= 0 ? min.y : max.y,
+            plane.normal.z >= 0 ? min.z : max.z
+        );
+
+        // If the positive vertex is outside, the entire AABB is outside
+        if (glm::dot(plane.normal, positive) + plane.distance < 0)
+            return false; // Fully outside, cull this chunk
+    }
+    return true; // At least part of the AABB is inside the frustum
+}

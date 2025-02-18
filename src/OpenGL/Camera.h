@@ -15,6 +15,11 @@
 #include "VBO.h"
 #include "GLContext.h"
 
+struct Plane {
+    glm::vec3 normal;
+    float distance;
+};
+
 struct Camera
 {
     GLContext* glContext;
@@ -68,6 +73,19 @@ struct Camera
 	void Matrix(Shader& shader, const char* uniform);
 	void Inputs();
     void drawFrustumFromCamera(Camera& camera);
+};
+
+struct Frustum {
+    std::array<Plane, 6> planes;
+
+    void update(const Camera& camera);
+
+    void extractFrustumPlanes(const glm::mat4& vpMatrix);
+
+    bool pointInFrustum(const glm::vec3& point) const;
+
+    // Function to check if an AABB intersects the frustum
+    bool intersectsAABB(const glm::vec3& min, const glm::vec3& max) const;
 };
 
 #endif // !CAMERA_CLASS_H
