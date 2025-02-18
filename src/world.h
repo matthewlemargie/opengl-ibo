@@ -42,6 +42,7 @@ struct World {
     GLuint ebo;
 
     chunkMesh ChunkMesh;
+    Chunk chunkmaker;
 
     Texture* atlas;
     Shader* shader;
@@ -55,7 +56,7 @@ struct World {
     ~World();
 
     void textureActivate();
-    void addChunkMeshToWorld(std::pair<int, int> posInWorld, std::vector<GLfloat> chunkVertices, std::vector<GLuint> chunkIndices);
+    void addChunkMeshToWorld(int xPos, int zPos, std::vector<GLfloat> chunkVertices, std::vector<GLuint> chunkIndices);
     void addBlock(int blockID, int posInChunk, std::array<int,2> posInWorld);
     void deleteBlock(int posInChunk, std::array<int,2> posInWorld);
     void Render(Camera& camera);

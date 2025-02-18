@@ -2,19 +2,20 @@
 #define CHUNK_H
 
 #include <iostream>
+#include <cmath>
 #include <chrono>
 #include <unordered_map>
 #include <tuple>
 #include <vector>
 #include <GL/gl.h>
+#include <FastNoiseLite.h>
 #include "constants.h"
 
 struct Chunk {
-    // hash map of chunk position (index) to block ID of position
-    // std::unordered_map<int, int> chunkInstanceMap;
+    FastNoiseLite noise;
     Chunk();
     ~Chunk();
+    std::vector<GLuint> populateChunk(int xPos, int zPos);
 };
-std::vector<GLuint> populateChunk();
 
 #endif

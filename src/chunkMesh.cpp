@@ -1,6 +1,6 @@
 #include "chunkMesh.h"
 
-std::pair<std::vector<GLfloat>, std::vector<GLuint>> chunkMesh::createMeshDataFromChunk(std::pair<int, int> posInWorld, std::vector<GLuint> blocksByPosition) {
+std::pair<std::vector<GLfloat>, std::vector<GLuint>> chunkMesh::createMeshDataFromChunk(int xPos, int zPos, std::vector<GLuint> blocksByPosition) {
     std::vector<GLfloat> vertices;
     std::vector<GLuint> indices;
 
@@ -13,9 +13,9 @@ std::pair<std::vector<GLfloat>, std::vector<GLuint>> chunkMesh::createMeshDataFr
         Direction{0, 1, 0},
     };
 
-    for (int z = 0; z < CHUNK_Z_DIM; ++z) {
-        for (int y = 0; y < CHUNK_Y_DIM; ++y) {
-            for (int x = 0; x < CHUNK_X_DIM; ++x) {
+    for (int x = 0; x < CHUNK_X_DIM; ++x) {
+        for (int z = 0; z < CHUNK_Z_DIM; ++z) {
+            for (int y = 0; y < CHUNK_Y_DIM; ++y) {
                 int i = x + (y * CHUNK_X_DIM) + (z * CHUNK_X_DIM * CHUNK_Y_DIM);  // Corrected flat index calculation
 
                 if (blocksByPosition[i] == AIR) continue;
@@ -25,16 +25,16 @@ std::pair<std::vector<GLfloat>, std::vector<GLuint>> chunkMesh::createMeshDataFr
                     int ny = y + dirs[face].yOffset;
                     int nz = z + dirs[face].zOffset;
 
-                    bool isOutOfBounds = nx < -1 || ny < -1 || nz < -1 || nx > CHUNK_X_DIM || ny >= CHUNK_Y_DIM || nz > CHUNK_Z_DIM;
+                    bool isOutOfBounds = nx < 0 || ny < 0 || nz < 0 || nx >= CHUNK_X_DIM || ny >= CHUNK_Y_DIM || nz >= CHUNK_Z_DIM;
                     int neighborIndex = nx + (ny * CHUNK_X_DIM) + (nz * CHUNK_X_DIM * CHUNK_Y_DIM);
 
                     if (isOutOfBounds || blocksByPosition[neighborIndex] == AIR) {
                         int vertexOffset = vertices.size() / 5; // Each vertex has (x, y, z, u, v)
 
                         for (int j = 0; j < 4; ++j) {
-                            vertices.push_back(cubeVertices[face * 12 + j * 3] + x + (CHUNK_X_DIM * std::get<0>(posInWorld)) - ((float)CHUNK_X_DIM * WORLD_X_DIM / 2));
+                            vertices.push_back(cubeVertices[face * 12 + j * 3] + x + (CHUNK_X_DIM * xPos) - ((float)CHUNK_X_DIM * WORLD_X_DIM / 2));
                             vertices.push_back(cubeVertices[face * 12 + j * 3 + 1] + y);
-                            vertices.push_back(cubeVertices[face * 12 + j * 3 + 2] + z + (CHUNK_Z_DIM * std::get<1>(posInWorld)) - ((float)CHUNK_Z_DIM * WORLD_X_DIM / 2));
+                            vertices.push_back(cubeVertices[face * 12 + j * 3 + 2] + z + (CHUNK_Z_DIM * zPos) - ((float)CHUNK_Z_DIM * WORLD_X_DIM / 2));
                             vertices.push_back(blockTexCoords[face * 8 + j * 2]);
                             vertices.push_back(blockTexCoords[face * 8 + j * 2 + 1]);
                         }

@@ -11,16 +11,17 @@
 
 #include "OpenGL/GLContext.h"
 #include "OpenGL/Camera.h"
+#include "OpenGL/Wireframe.h"
 
 #include "world.h"
-#include "OpenGL/Wireframe.h"
+#include "constants.h"
 
 int main()
 {
     double start = glfwGetTime();
     // Init gl context before doing anything in gl (or else you get dreaded segmentation fault)
     GLContext glContext;
-    Camera camera(&glContext, glm::vec3(8.0f, 17.0f, 8.0f), 60.0f, 1.0f, 1000.0f);
+    Camera camera(&glContext, glm::vec3((float)WORLD_X_DIM / 2.0, (float)CHUNK_Y_DIM + 1.0f, (float)WORLD_Z_DIM / 2.0), 60.0f, 1.0f, 1000.0f);
     // Scene scene(&glContext);
     double timeToPrepare = glfwGetTime() - start;
     cout << "Scene prepared in " << timeToPrepare << "s" << endl;

@@ -29,12 +29,11 @@ World::World(GLContext* context)
     std::vector<GLuint> chunk;
     for (int i = 0; i < WORLD_X_DIM; ++i) {
         for (int j = 0; j < WORLD_Z_DIM; ++j) {
-            std::pair<int, int> posInWorld = std::make_pair(i, j);
-            chunk = populateChunk();
-            auto meshData = ChunkMesh.createMeshDataFromChunk(posInWorld, chunk);
+            chunk = chunkmaker.populateChunk(i, j);
+            auto meshData = ChunkMesh.createMeshDataFromChunk(i, j, chunk);
             auto vertices = std::get<0>(meshData); 
             auto indices = std::get<1>(meshData); 
-            addChunkMeshToWorld(posInWorld, vertices, indices);
+            addChunkMeshToWorld(i, j, vertices, indices);
         }
     }
 
@@ -51,7 +50,7 @@ World::~World() {
     delete shader;
 }
 
-void World::addChunkMeshToWorld(std::pair<int, int> posInWorld, std::vector<GLfloat> chunkVertices, std::vector<GLuint> chunkIndices) {
+void World::addChunkMeshToWorld(int xPos, int zPos, std::vector<GLfloat> chunkVertices, std::vector<GLuint> chunkIndices) {
     if (chunkVertices.empty() || chunkIndices.empty()) return;  // Ignore empty chunks
 
     glBindVertexArray(vao);
@@ -74,7 +73,7 @@ void World::addChunkMeshToWorld(std::pair<int, int> posInWorld, std::vector<GLfl
     glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, eboOffsetBytes, chunkIndices.size() * sizeof(GLuint), chunkIndices.data());
 
     // Store the index buffer offset for this chunk
-    chunkIndexOffsets[posInWorld] = currentEBOOffset;
+    chunkIndexOffsets[std::make_pair(xPos, zPos)] = currentEBOOffset;
 
     // Update offsets for the next chunk
     currentVBOOffset += chunkVertices.size();
