@@ -13,6 +13,7 @@
 #include "OpenGL/Camera.h"
 #include "OpenGL/Wireframe.h"
 
+#include "OpenGL/skybox.h"
 #include "world.h"
 #include "constants.h"
 
@@ -26,6 +27,7 @@ int main()
     double timeToPrepare = glfwGetTime() - start;
     cout << "Scene prepared in " << timeToPrepare << "s" << endl;
 
+    Skybox skybox;
     World world(&glContext);
 
     const double targetFPS = glContext.mode->refreshRate;
@@ -53,6 +55,7 @@ int main()
         ImGui::NewFrame();
 
         wf.toggleWireframe();
+        skybox.Draw(&camera);
         world.Render(camera);
         // Create a window and display variables
         ImGui::Begin("Variable Viewer");

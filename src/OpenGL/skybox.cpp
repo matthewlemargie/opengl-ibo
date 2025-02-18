@@ -22,21 +22,10 @@ Skybox::Skybox()
     // std::string parentDir = (filesystem::current_path().filesystem::path::parent_path()).string();
     // parentDir = parentDir + "/src";
     std::string spaceboxDir = "assets/skyboxes/spacebox";
-    std::string skyboxDir = "assets/skyboxes/cloudy/blue";
 	// All the faces of the cubemap (make sure they are in this exact order)
-	std::string facesCubemap[6] =
-	{
-        skyboxDir + "/right.png",
-        skyboxDir + "/left.png",
-        skyboxDir + "/up.png",
-        skyboxDir + "/down.png",
-        skyboxDir + "/front.png",
-        skyboxDir + "/back.png",
-	};
-
 	std::string spaceboxImages[6] =
 	{
-        spaceboxDir + "/right-flip.png",
+        spaceboxDir + "/right.png",
         spaceboxDir + "/left.png",
         spaceboxDir + "/top.png",
         spaceboxDir + "/bottom.png",
@@ -85,7 +74,6 @@ Skybox::Skybox()
 		}
 		else
 		{
-			std::cout << "Failed to load texture: " << facesCubemap[i] << std::endl;
 			stbi_image_free(data);
 		}
 	}
@@ -94,8 +82,7 @@ Skybox::Skybox()
 }
 
 void Skybox::Draw(Camera* camera) {
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    // glDepthFunc(GL_LEQUAL);
+    glDepthFunc(GL_LEQUAL);
     glDepthMask(GL_FALSE);
     skyboxShader->Activate();
     glm::mat4 view = glm::mat4(glm::mat3(glm::lookAt(camera->Position, camera->Position + camera->Orientation, camera->Up)));
@@ -114,6 +101,6 @@ void Skybox::Draw(Camera* camera) {
 
     // Switch back to the normal depth function
     glDepthMask(GL_TRUE);
-    // glDepthFunc(GL_LESS);
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // glClear(GL_DEPTH_BUFFER_BIT);
+    glDepthFunc(GL_LESS);
 }

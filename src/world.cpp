@@ -78,6 +78,7 @@ void World::textureActivate() {
 
 void World::Render(Camera& camera) {
     auto start = std::chrono::high_resolution_clock::now();
+    shader->Activate();
     camera.Inputs();
     camera.updateMatrix();
     camera.Matrix(*shader, "camMatrix");
