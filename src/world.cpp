@@ -9,20 +9,22 @@ World::World(GLContext* context)
 
     float totalVRAMUsage = 0.0f;
 
-    // Generate chunks and store them as individual VAOs, VBOs, and EBOs
-    std::vector<GLuint> chunk;
+    Chunk chunkTemplate;
+    // Generate chunks and store them as individual VAOs, VBOs, and chunkEBOs
     for (int i = 0; i < WORLD_X_DIM; ++i) {
         for (int j = 0; j < WORLD_Z_DIM; ++j) {
-            chunk = chunkmaker.populateChunk(i, j);
-            auto meshData = ChunkMesh.createMeshDataFromChunk(i, j, chunk);
+            auto blocks = chunkTemplate.populateChunk(i, j);
+            chunks[{i, j}] = blocks;
+        }
+    }
+
+    for (int i = 0; i < WORLD_X_DIM; ++i) {
+        for (int j = 0; j < WORLD_Z_DIM; ++j) {
+            auto blocks = chunks[{i, j}];
+            auto meshData = chunkmaker.createMeshDataFromChunk(i, j, blocks, chunks);
             auto vertices = std::get<0>(meshData); 
             auto indices = std::get<1>(meshData); 
-
             addChunkMeshToWorld(i, j, vertices, indices);
-
-            // Accumulate VRAM usage
-            totalVRAMUsage += vertices.size() * sizeof(GLfloat);
-            totalVRAMUsage += indices.size() * sizeof(GLuint);
         }
     }
 
@@ -33,6 +35,8 @@ World::World(GLContext* context)
 }
 
 World::~World() {
+    chunks.clear();
+
     delete atlas;
     delete shader;
 }

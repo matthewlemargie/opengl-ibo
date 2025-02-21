@@ -8,11 +8,21 @@
 #include <vector>
 #include <iostream>
 #include <array>
+#include <unordered_map>
 
+#include "chunk.h"
+#include <FastNoiseLite.h>
 #include "constants.h"
 
 struct Direction {
     int xOffset, yOffset, zOffset;
+};
+
+struct pair_hash {
+    template <class T1, class T2>
+    std::size_t operator()(const std::pair<T1, T2>& pair) const {
+        return std::hash<T1>()(pair.first) ^ (std::hash<T2>()(pair.second) << 1);
+    }
 };
 
 struct chunkMesh {
@@ -91,7 +101,11 @@ struct chunkMesh {
         16, 19, 17, 16, 18, 19, // Bottom
         20, 23, 21, 20, 22, 23  // Top
     };
-    std::pair<std::vector<Vertex>, std::vector<GLuint>> createMeshDataFromChunk(int xPos, int zPos, std::vector<GLuint> blocksByPosition);
+    std::pair<std::vector<Vertex>, std::vector<GLuint>> createMeshDataFromChunk(
+    int xPos, int zPos, 
+    const std::vector<int>& blocksByPosition,  // <-- Pass by reference
+    std::unordered_map<std::pair<int, int>, std::vector<int>, pair_hash>& chunks);
+
 };
 
 

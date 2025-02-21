@@ -24,23 +24,18 @@
 #include <utility>  // For std::pair
 #include <functional>  // For std::hash
 
-struct pair_hash {
-    template <class T1, class T2>
-    std::size_t operator()(const std::pair<T1, T2>& pair) const {
-        return std::hash<T1>()(pair.first) ^ (std::hash<T2>()(pair.second) << 1);
-    }
-};
 struct World {
     bool firstChunk = true;
     Frustum frustum;
+
+    std::unordered_map<std::pair<int, int>, std::vector<int>, pair_hash> chunks;
 
     std::unordered_map<std::pair<int, int>, GLuint, pair_hash> chunkVAOs;
     std::unordered_map<std::pair<int, int>, GLuint, pair_hash> chunkVBOs;
     std::unordered_map<std::pair<int, int>, GLuint, pair_hash> chunkEBOs;
     std::unordered_map<std::pair<int, int>, size_t, pair_hash> chunkIndexCounts;
 
-    chunkMesh ChunkMesh;
-    Chunk chunkmaker;
+    chunkMesh chunkmaker;
 
     Texture* atlas;
     Shader* shader;

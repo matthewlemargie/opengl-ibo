@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 
 constexpr int CHUNK_X_DIM = 16;
-constexpr int CHUNK_Y_DIM = 32;
+constexpr int CHUNK_Y_DIM = 256;
 constexpr int CHUNK_Z_DIM = 16;
 constexpr int CHUNK_TOTAL_BLOCKS = CHUNK_X_DIM * CHUNK_Y_DIM * CHUNK_Z_DIM;
 
