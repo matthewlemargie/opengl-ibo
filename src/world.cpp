@@ -18,14 +18,46 @@ World::World(GLContext* context)
         }
     }
 
+    std::vector<std::thread> threads;
+
+    std::vector<std::pair<std::vector<Vertex>, std::vector<GLuint>>> meshDatas(WORLD_X_DIM * WORLD_Z_DIM);
+    std::mutex meshDatasMutex;
+
+    int numThreads = 8;
+    int counter = 0;
+
     for (int i = 0; i < WORLD_X_DIM; ++i) {
         for (int j = 0; j < WORLD_Z_DIM; ++j) {
-            auto blocks = chunks[{i, j}];
-            auto meshData = chunkmaker.createMeshDataFromChunk(i, j, blocks, chunks);
-            auto vertices = std::get<0>(meshData); 
-            auto indices = std::get<1>(meshData); 
-            addChunkMeshToWorld(i, j, vertices, indices);
+            threads.emplace_back([=, &meshDatasMutex, &meshDatas]() {  // Capture mutex and vector by reference
+                auto blocks = chunks[{i, j}];
+                auto meshData = chunkmaker.createMeshDataFromChunk(i, j, blocks, chunks);
+                
+                // ✅ Lock mutex safely
+                std::lock_guard<std::mutex> lock(meshDatasMutex);
+                meshDatas[i * WORLD_X_DIM + j] = meshData;
+            });
+            if (counter == numThreads) {
+                for (auto& thread : threads) {
+                    thread.join();
+                }
+                threads.clear();
+                counter = 0;
+            }
+            else
+                counter++;
         }
+    }
+
+    for (auto& thread : threads) {
+        thread.join();
+    }
+
+    for (size_t i = 0; i < meshDatas.size(); ++i) {
+        int z = i % WORLD_X_DIM;
+        int x = i / WORLD_X_DIM;
+        auto& vertices = std::get<0>(meshDatas[i]); 
+        auto& indices = std::get<1>(meshDatas[i]); 
+        addChunkMeshToWorld(x, z, vertices, indices);
     }
 
     auto end = std::chrono::high_resolution_clock::now();

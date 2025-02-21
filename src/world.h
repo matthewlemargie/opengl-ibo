@@ -23,6 +23,8 @@
 #include <map>
 #include <utility>  // For std::pair
 #include <functional>  // For std::hash
+#include <thread>
+#include <mutex>
 
 struct World {
     bool firstChunk = true;
