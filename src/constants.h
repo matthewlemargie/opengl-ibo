@@ -8,8 +8,8 @@ constexpr int CHUNK_Y_DIM = 32;
 constexpr int CHUNK_Z_DIM = 16;
 constexpr int CHUNK_TOTAL_BLOCKS = CHUNK_X_DIM * CHUNK_Y_DIM * CHUNK_Z_DIM;
 
-constexpr int WORLD_X_DIM = 50;
-constexpr int WORLD_Z_DIM = 50;
+constexpr int WORLD_X_DIM = 10;
+constexpr int WORLD_Z_DIM = 10;
 constexpr int WORLD_TOTAL_CHUNKS = WORLD_X_DIM * WORLD_Z_DIM;
 
 constexpr int TOTAL_BLOCKS_RENDERED = WORLD_TOTAL_CHUNKS * CHUNK_TOTAL_BLOCKS;
@@ -20,7 +20,7 @@ enum BlockID {
     BLOCKID_COUNT,
 };
 
-struct BlockVertex {
+struct Vertex {
     glm::vec3 position;
     glm::vec2 texCoord;
     char direction;

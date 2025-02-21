@@ -1,7 +1,7 @@
 #include "chunkMesh.h"
 
-std::pair<std::vector<BlockVertex>, std::vector<GLuint>> chunkMesh::createMeshDataFromChunk(int xPos, int zPos, std::vector<GLuint> blocksByPosition) {
-    std::vector<BlockVertex> vertices;
+std::pair<std::vector<Vertex>, std::vector<GLuint>> chunkMesh::createMeshDataFromChunk(int xPos, int zPos, std::vector<GLuint> blocksByPosition) {
+    std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
 
     std::array<Direction, 6> dirs = {
@@ -17,7 +17,7 @@ std::pair<std::vector<BlockVertex>, std::vector<GLuint>> chunkMesh::createMeshDa
     for (int x = 0; x < CHUNK_X_DIM; ++x) {
         for (int z = 0; z < CHUNK_Z_DIM; ++z) {
             for (int y = 0; y < CHUNK_Y_DIM; ++y) {
-                int i = x + (y * CHUNK_X_DIM) + (z * CHUNK_X_DIM * CHUNK_Y_DIM);  // Corrected flat index calculation
+                int i = x + (y * CHUNK_X_DIM) + (z * CHUNK_X_DIM * CHUNK_Y_DIM);
 
                 if (blocksByPosition[i] == AIR) continue;
 
@@ -31,10 +31,10 @@ std::pair<std::vector<BlockVertex>, std::vector<GLuint>> chunkMesh::createMeshDa
                     int neighborIndex = nx + (ny * CHUNK_X_DIM) + (nz * CHUNK_X_DIM * CHUNK_Y_DIM);
 
                     if (isOutOfBounds || blocksByPosition[neighborIndex] == AIR) {
-                        int vertexOffset = vertices.size(); // Each vertex has (x, y, z, u, v)
+                        int vertexOffset = vertices.size();
 
                         for (int j = 0; j < 4; ++j) {
-                            BlockVertex vertex;
+                            Vertex vertex;
                             vertex.position = glm::vec3(cubeVertices[face * 12 + j * 3] + x + (CHUNK_X_DIM * xPos) - ((float)CHUNK_X_DIM * WORLD_X_DIM / 2), cubeVertices[face * 12 + j * 3 + 1] + y, cubeVertices[face * 12 + j * 3 + 2] + z + (CHUNK_Z_DIM * zPos) - ((float)CHUNK_Z_DIM * WORLD_X_DIM / 2));
                             vertex.texCoord = glm::vec2(blockTexCoords[face * 8 + j * 2], blockTexCoords[face * 8 + j * 2 + 1]);
                             vertex.direction = face;

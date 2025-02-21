@@ -7,20 +7,15 @@
 #include <thread>
 
 #include "GLContext.h"
-#include "Mesh.h"
 #include "skybox.h"
 #include "shaderClass.h"
-#include "Ray.h"
 #include "Wireframe.h"
-#include "../ModelLoader.h"
 #include "../GenerateRandoms.h"
 
 struct Scene {
     GLContext* glContext;
     // World world;
 
-    std::set<Mesh*> meshes;
-    std::set<Block*> blocks;
     // Skybox skybox;
 
     Shader shader;
@@ -36,7 +31,5 @@ struct Scene {
 
     Scene(struct GLContext* GLContext);
 
-    void addObject(Mesh& mesh);
-    void addBlock(Block& block);
 	void Render(Camera* camera);
 };

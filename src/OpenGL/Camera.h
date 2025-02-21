@@ -9,10 +9,9 @@
 #include<glm/gtc/type_ptr.hpp>
 #include<glm/gtx/rotate_vector.hpp>
 #include<glm/gtx/vector_angle.hpp>
+#include <array>
 
 #include "shaderClass.h"
-#include "VAO.h"
-#include "VBO.h"
 #include "GLContext.h"
 
 struct Plane {
@@ -59,7 +58,7 @@ struct Camera
 
 	GLfloat vertices[72];
 
-	GLuint VAO, VBO;
+    GLuint VAO;
 
     Shader frustumShader;
 

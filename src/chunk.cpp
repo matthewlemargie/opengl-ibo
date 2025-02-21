@@ -1,15 +1,15 @@
 #include "chunk.h"
 
 Chunk::Chunk() {
-    noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
-    noise.SetFrequency(0.01f);  // Use a moderate frequency for wavy hills
+    noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2S);
+    noise.SetFrequency(0.006f);  // Use a moderate frequency for wavy hills
     unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
     noise.SetSeed(seed);}
 
 Chunk::~Chunk() {}
 
 std::vector<GLuint> Chunk::populateChunk(int chunkX, int chunkZ) {
-    float frequency = 0.01f;  // Set a frequency that makes waves over short distances
+    float frequency = 0.006f;  // Set a frequency that makes waves over short distances
     // float amplitude = 0.9f;  // Control the height of the hills (lower = flatter terrain)
 
     std::vector<GLuint> newBlocks(CHUNK_X_DIM * CHUNK_Y_DIM * CHUNK_Z_DIM, AIR);
@@ -23,12 +23,11 @@ std::vector<GLuint> Chunk::populateChunk(int chunkX, int chunkZ) {
             float worldZ = (chunkZ * CHUNK_Z_DIM) + i;
 
             float value = noise.GetNoise(worldX, worldZ);
-            // float value = noise.GetNoise(worldX * frequency, worldZ * frequency);
             float normalizedValue = (value + 1.0f) / 2.0f;
             
             // Scale the height so that it varies between height * 0.8 and height * 1.0
             float height = value * CHUNK_Y_DIM;  // Adjust the height
-            // height = height * 0.8f + (height * 0.2f);  // Further scale it between 0.8 and 1.0
+            height = 0.8f * CHUNK_Y_DIM + (0.2f) * (height);  // Further scale it between 0.8 and 1.0
 
             int roundHeight = static_cast<int>(std::ceil(height));
             roundHeight = std::max(1, roundHeight);  // Ensure at least one block is placed

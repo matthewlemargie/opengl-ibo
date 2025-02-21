@@ -37,7 +37,7 @@ World::~World() {
     delete shader;
 }
 
-void World::addChunkMeshToWorld(int xPos, int zPos, std::vector<BlockVertex> chunkVertices, std::vector<GLuint> chunkIndices) {
+void World::addChunkMeshToWorld(int xPos, int zPos, std::vector<Vertex> chunkVertices, std::vector<GLuint> chunkIndices) {
     GLuint vao, vbo, ebo;
 
     glGenVertexArrays(1, &vao);
@@ -45,17 +45,17 @@ void World::addChunkMeshToWorld(int xPos, int zPos, std::vector<BlockVertex> chu
 
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, chunkVertices.size() * sizeof(BlockVertex), chunkVertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, chunkVertices.size() * sizeof(Vertex), chunkVertices.data(), GL_STATIC_DRAW);
 
     glGenBuffers(1, &ebo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, chunkIndices.size() * sizeof(GLuint), chunkIndices.data(), GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(BlockVertex), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(BlockVertex), (void*)sizeof(glm::vec3));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)sizeof(glm::vec3));
     glEnableVertexAttribArray(1);
-    glVertexAttribIPointer(2, 1, GL_BYTE, sizeof(BlockVertex), (void*)(sizeof(glm::vec3) + sizeof(glm::vec2)));
+    glVertexAttribIPointer(2, 1, GL_BYTE, sizeof(Vertex), (void*)(sizeof(glm::vec3) + sizeof(glm::vec2)));
     glEnableVertexAttribArray(2);
 
     glBindVertexArray(0);

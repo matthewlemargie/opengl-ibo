@@ -10,10 +10,6 @@
 #include <iterator>
 #include <chrono>
 
-#include "OpenGL/VAO.h"
-#include "OpenGL/VBO.h"
-#include "OpenGL/EBO.h"
-#include "OpenGL/IBO.h"
 #include "OpenGL/Texture.h"
 #include "OpenGL/shaderClass.h"
 #include "OpenGL/Camera.h"
@@ -52,7 +48,7 @@ struct World {
     ~World();
 
     void textureActivate();
-    void addChunkMeshToWorld(int xPos, int zPos, std::vector<BlockVertex> chunkVertices, std::vector<GLuint> chunkIndices);
+    void addChunkMeshToWorld(int xPos, int zPos, std::vector<Vertex> chunkVertices, std::vector<GLuint> chunkIndices);
     void addBlock(int blockID, int posInChunk, std::array<int,2> posInWorld);
     void deleteBlock(int posInChunk, std::array<int,2> posInWorld);
     void Render(Camera& camera);
