@@ -101,6 +101,20 @@ struct chunkMesh {
         16, 19, 17, 16, 18, 19, // Bottom
         20, 23, 21, 20, 22, 23  // Top
     };
+
+    std::vector<Vertex> vertices;
+    std::vector<GLuint> indices;
+
+    std::array<Direction, 6> dirs = {
+        Direction{0, 0, -1},
+        Direction{0, 0, 1}, 
+        Direction{-1, 0, 0},
+        Direction{1, 0, 0},
+        Direction{0, -1, 0},
+        Direction{0, 1, 0},
+    };
+
+    int oppositeFace(int face);
     std::pair<std::vector<Vertex>, std::vector<GLuint>> createMeshDataFromChunk(
     int xPos, int zPos, 
     const std::vector<int>& blocksByPosition,  // <-- Pass by reference

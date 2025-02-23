@@ -11,8 +11,8 @@ World::World(GLContext* context)
 
     Chunk chunkTemplate;
     // Generate chunks and store them as individual VAOs, VBOs, and chunkEBOs
-    for (int i = 0; i < WORLD_X_DIM; ++i) {
-        for (int j = 0; j < WORLD_Z_DIM; ++j) {
+    for (int i = -1; i <= WORLD_X_DIM; ++i) {
+        for (int j = -1; j <= WORLD_Z_DIM; ++j) {
             auto blocks = chunkTemplate.populateChunk(i, j);
             chunks[{i, j}] = blocks;
         }
@@ -33,7 +33,7 @@ World::World(GLContext* context)
                 auto meshData = chunkmaker.createMeshDataFromChunk(i, j, blocks, chunks);
                 
                 // ✅ Lock mutex safely
-                std::lock_guard<std::mutex> lock(meshDatasMutex);
+                // std::lock_guard<std::mutex> lock(meshDatasMutex);
                 meshDatas[i * WORLD_X_DIM + j] = meshData;
             });
             if (counter == numThreads) {

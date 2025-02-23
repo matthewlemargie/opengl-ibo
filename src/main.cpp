@@ -34,7 +34,8 @@ int main()
     const double frameTime = 1.0 / targetFPS;
     WireframeToggler wf(glContext.window);
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGuiIO& io = ImGui::GetIO(); 
+    (void)io;
     ImGui::StyleColorsDark();  // Optional: change theme
 
     // Setup Platform/Renderer bindings
@@ -55,7 +56,7 @@ int main()
         ImGui::NewFrame();
 
         wf.toggleWireframe();
-        skybox.Draw(&camera);
+        // skybox.Draw(&camera);
         world.Render(camera);
         // Create a window and display variables
         ImGui::Begin("Variable Viewer");
