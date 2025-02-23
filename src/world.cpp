@@ -1,76 +1,115 @@
 #include "world.h"
 
-World::World(GLContext* context) 
-{
+World::World(GLContext* context) {
     auto start = std::chrono::high_resolution_clock::now();
 
     shader = new Shader("shaders/block_vert.glsl", "shaders/block_frag.glsl");
     atlas = new Texture("assets/textures/grass.jpg", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
 
-    float totalVRAMUsage = 0.0f;
-
-    Chunk chunkTemplate;
-    // Generate chunks and store them as individual VAOs, VBOs, and chunkEBOs
-    for (int i = -1; i <= WORLD_X_DIM; ++i) {
-        for (int j = -1; j <= WORLD_Z_DIM; ++j) {
-            auto blocks = chunkTemplate.populateChunk(i, j);
-            chunks[{i, j}] = blocks;
-        }
-    }
-
-    std::vector<std::thread> threads;
-
-    std::vector<std::pair<std::vector<Vertex>, std::vector<GLuint>>> meshDatas(WORLD_X_DIM * WORLD_Z_DIM);
-    std::mutex meshDatasMutex;
-
-    int numThreads = 8;
-    int counter = 0;
-
-    for (int i = 0; i < WORLD_X_DIM; ++i) {
-        for (int j = 0; j < WORLD_Z_DIM; ++j) {
-            threads.emplace_back([=, &meshDatasMutex, &meshDatas]() {  // Capture mutex and vector by reference
-                auto blocks = chunks[{i, j}];
-                auto meshData = chunkmaker.createMeshDataFromChunk(i, j, blocks, chunks);
-                
-                // ✅ Lock mutex safely
-                // std::lock_guard<std::mutex> lock(meshDatasMutex);
-                meshDatas[i * WORLD_X_DIM + j] = meshData;
-            });
-            if (counter == numThreads) {
-                for (auto& thread : threads) {
-                    thread.join();
-                }
-                threads.clear();
-                counter = 0;
-            }
-            else
-                counter++;
-        }
-    }
-
-    for (auto& thread : threads) {
-        thread.join();
-    }
-
-    for (size_t i = 0; i < meshDatas.size(); ++i) {
-        int z = i % WORLD_X_DIM;
-        int x = i / WORLD_X_DIM;
-        auto& vertices = std::get<0>(meshDatas[i]); 
-        auto& indices = std::get<1>(meshDatas[i]); 
-        addChunkMeshToWorld(x, z, vertices, indices);
-    }
+    std::cout << "World initialized!" << std::endl;
 
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duration = end - start;
-    std::cout << "World initialized in " << duration.count() << "s" << std::endl;
-    std::cout << "Total space used on VRAM: " << totalVRAMUsage / 1000000.0f << "MBs" << std::endl;
+    std::cout << "Initialization took " << duration.count() << " seconds" << std::endl;
 }
 
 World::~World() {
     chunks.clear();
-
+    for (auto& [pos, vao] : chunkVAOs) {
+        glDeleteVertexArrays(1, &vao);
+        glDeleteBuffers(1, &chunkVBOs[pos]);
+        glDeleteBuffers(1, &chunkEBOs[pos]);
+    }
     delete atlas;
     delete shader;
+}
+
+void World::updateChunks(Camera& camera) {
+    float worldOffsetX = (WORLD_X_DIM * CHUNK_X_DIM) / 2.0f;
+    float worldOffsetZ = (WORLD_Z_DIM * CHUNK_Z_DIM) / 2.0f;
+
+    int newChunkX = (static_cast<int>(camera.Position.x + worldOffsetX) / CHUNK_X_DIM);
+    int newChunkZ = (static_cast<int>(camera.Position.z + worldOffsetZ) / CHUNK_Z_DIM);
+
+    if (currentChunk.first != newChunkX || currentChunk.second != newChunkZ) {
+        currentChunk = {newChunkX, newChunkZ};
+        loadChunksAround(newChunkX, newChunkZ);
+    }
+}
+
+void World::loadChunksAround(int centerX, int centerZ) {
+    // std::vector<std::thread> threads;
+    std::mutex chunkMutex;
+
+    std::unordered_map<std::pair<int, int>, std::vector<int>, pair_hash> newChunks;
+    std::vector<std::pair<int, int>> chunksToDelete;
+
+    // Find chunks to delete (out of load radius)
+    for (auto& [pos, _] : chunks) {
+        int xDist = abs(pos.first - centerX);
+        int zDist = abs(pos.second - centerZ);
+        if (xDist > WORLD_X_DIM / 2 || zDist > WORLD_Z_DIM / 2) {
+            chunksToDelete.push_back(pos);
+        }
+    }
+
+    // Remove chunks that are too far from the player
+    for (auto& pos : chunksToDelete) {
+        removeChunkFromWorld(pos.first, pos.second);
+    }
+
+    const int meshLoadRadius = WORLD_X_DIM / 2;   // Chunks that are actually rendered.
+    const int dataBuffer = 1;       // Extra ring for neighbor occlusion.
+    const int dataLoadRadius = meshLoadRadius + dataBuffer;
+
+
+    // Load new chunk data in a slightly larger buffer zone:
+    for (int i = -dataLoadRadius; i <= dataLoadRadius; ++i) {
+        for (int j = -dataLoadRadius; j <= dataLoadRadius; ++j) {
+            int chunkX = centerX + i;
+            int chunkZ = centerZ + j;
+            if (chunks.find({chunkX, chunkZ}) != chunks.end()) continue;
+            
+            auto blocks = chunkTemplate.populateChunk(chunkX, chunkZ);
+            {
+                std::lock_guard<std::mutex> lock(chunkMutex);
+                newChunks[{chunkX, chunkZ}] = blocks;
+            }
+        }
+    }
+
+    // Now add the loaded data to your main chunk map:
+    for (auto& [pos, blocks] : newChunks) {
+        chunks[pos] = blocks;
+    }
+
+    // Generate mesh only for chunks within the mesh load radius:
+    for (int i = -meshLoadRadius; i <= meshLoadRadius; ++i) {
+        for (int j = -meshLoadRadius; j <= meshLoadRadius; ++j) {
+            int chunkX = centerX + i;
+            int chunkZ = centerZ + j;
+            auto it = chunks.find({chunkX, chunkZ});
+            if (it == chunks.end()) continue;  // Should be loaded, but check to be safe.
+            
+            auto meshData = chunkmaker.createMeshDataFromChunk(chunkX, chunkZ, it->second, chunks);
+            addChunkMeshToWorld(chunkX, chunkZ, meshData.first, meshData.second);
+        }
+    }
+}
+
+void World::removeChunkFromWorld(int xPos, int zPos) {
+    std::pair<int, int> pos = {xPos, zPos};
+    if (chunkVAOs.find(pos) != chunkVAOs.end()) {
+        glDeleteVertexArrays(1, &chunkVAOs[pos]);
+        glDeleteBuffers(1, &chunkVBOs[pos]);
+        glDeleteBuffers(1, &chunkEBOs[pos]);
+
+        chunkVAOs.erase(pos);
+        chunkVBOs.erase(pos);
+        chunkEBOs.erase(pos);
+        chunkIndexCounts.erase(pos);
+        chunks.erase(pos);
+    }
 }
 
 void World::addChunkMeshToWorld(int xPos, int zPos, std::vector<Vertex> chunkVertices, std::vector<GLuint> chunkIndices) {
@@ -96,7 +135,6 @@ void World::addChunkMeshToWorld(int xPos, int zPos, std::vector<Vertex> chunkVer
 
     glBindVertexArray(0);
 
-    // Store VAO, VBO, and EBO in maps
     std::pair<int, int> chunkPos = {xPos, zPos};
     chunkVAOs[chunkPos] = vao;
     chunkVBOs[chunkPos] = vbo;
@@ -104,18 +142,15 @@ void World::addChunkMeshToWorld(int xPos, int zPos, std::vector<Vertex> chunkVer
     chunkIndexCounts[chunkPos] = chunkIndices.size();
 }
 
-void World::addBlock(int blockID, int posInChunk, std::array<int, 2> posInWorld) {
-}
-
 void World::textureActivate() {
     atlas->texUnit(*shader, "tex0", 0);
     atlas->Bind();
 }
 
+// In World::Render - Fix Chunk Position Offsets
 void World::Render(Camera& camera) {
-    // frustum culling
+    // updateChunks(camera);
 
-    auto start = std::chrono::high_resolution_clock::now();
     shader->Activate();
     camera.Inputs();
     camera.updateMatrix();
@@ -123,15 +158,15 @@ void World::Render(Camera& camera) {
 
     frustum.update(camera);
     textureActivate();
+
+    float worldOffsetX = (WORLD_X_DIM * CHUNK_X_DIM) / 2.0f;
+    float worldOffsetZ = (WORLD_Z_DIM * CHUNK_Z_DIM) / 2.0f;
+
     for (auto& [pos, vao] : chunkVAOs) {
-        // Offsets to center the world
-        float worldOffsetX = (WORLD_X_DIM * CHUNK_X_DIM) / 2.0f;
-        float worldOffsetZ = (WORLD_Z_DIM * CHUNK_Z_DIM) / 2.0f;
+        int xPos = pos.first;
+        int zPos = pos.second;
 
-        // Assume pos is stored as (x, z)
-        int xPos = std::get<0>(pos);
-        int zPos = std::get<1>(pos);
-
+        // Adjust chunk position offsets to be relative to the world center
         glm::vec3 min = {
             (float)(xPos * CHUNK_X_DIM) - worldOffsetX,
             0.0f,
@@ -144,6 +179,7 @@ void World::Render(Camera& camera) {
             (float)((zPos + 1) * CHUNK_Z_DIM) - worldOffsetZ
         };
 
+
         if (frustum.intersectsAABB(min, max)) {
             glBindVertexArray(vao);
             glDrawElements(GL_TRIANGLES, chunkIndexCounts[pos], GL_UNSIGNED_INT, 0);
@@ -151,8 +187,5 @@ void World::Render(Camera& camera) {
     }
 
     glBindVertexArray(0);
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> duration = end - start;
-    // std::cout << "Entire render call took " << duration.count() << " s" << std::endl;
 }
 

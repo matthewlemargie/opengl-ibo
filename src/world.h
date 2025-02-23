@@ -19,6 +19,7 @@
 #include "constants.h"
 #include "chunk.h"
 #include "chunkMesh.h"
+#include "OpenGL/Camera.h"
 
 #include <map>
 #include <utility>  // For std::pair
@@ -26,28 +27,36 @@
 #include <thread>
 #include <mutex>
 
+
 struct World {
-    bool firstChunk = true;
-    Frustum frustum;
-
-    std::unordered_map<std::pair<int, int>, std::vector<int>, pair_hash> chunks;
-
-    std::unordered_map<std::pair<int, int>, GLuint, pair_hash> chunkVAOs;
-    std::unordered_map<std::pair<int, int>, GLuint, pair_hash> chunkVBOs;
-    std::unordered_map<std::pair<int, int>, GLuint, pair_hash> chunkEBOs;
-    std::unordered_map<std::pair<int, int>, size_t, pair_hash> chunkIndexCounts;
-
-    chunkMesh chunkmaker;
-
-    Texture* atlas;
-    Shader* shader;
     World(GLContext* context);
     ~World();
 
-    void textureActivate();
+    void updateChunks(Camera& camera);  // Handles dynamic chunk loading/unloading
+    void loadChunksAround(int centerX, int centerZ);  // Loads chunks in a radius
+    void removeChunkFromWorld(int xPos, int zPos);  // Removes old chunks
     void addChunkMeshToWorld(int xPos, int zPos, std::vector<Vertex> chunkVertices, std::vector<GLuint> chunkIndices);
-    void addBlock(int blockID, int posInChunk, std::array<int,2> posInWorld);
-    void deleteBlock(int posInChunk, std::array<int,2> posInWorld);
+    
+    void textureActivate();
     void Render(Camera& camera);
+    std::unordered_map<std::pair<int, int>, std::vector<int>, pair_hash> chunks;
+
+    std::vector<std::thread> threads;
+    std::mutex chunkMutex;
+
+    Chunk chunkTemplate;
+    Shader* shader;
+    Texture* atlas;
+    Frustum frustum;
+    chunkMesh chunkmaker;
+
+    std::unordered_map<std::pair<int, int>, GLuint, pair_hash> chunkVAOs;  // VAO storage
+    std::unordered_map<std::pair<int, int>, GLuint, pair_hash> chunkVBOs;
+    std::unordered_map<std::pair<int, int>, GLuint, pair_hash> chunkEBOs;
+    std::unordered_map<std::pair<int, int>, int, pair_hash> chunkIndexCounts;  // Index count for each chunk
+
+    std::pair<int, int> currentChunk = {0, 0};  // Player's current chunk
 };
-#endif
+
+#endif // WORLD_H
+

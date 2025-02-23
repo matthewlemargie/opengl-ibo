@@ -1,8 +1,8 @@
 #include "FPS.h"
 
 void FPSCounter::outputFPS() {
-    printf("\x1b[d");
-    printf("\x1b[2J");
+    // printf("\x1b[d");
+    // printf("\x1b[2J");
     currTime = glfwGetTime();
     timeDiff = currTime - prevTime;
     counter++;
