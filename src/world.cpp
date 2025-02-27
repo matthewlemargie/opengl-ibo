@@ -24,24 +24,71 @@ World::~World() {
     delete shader;
 }
 
-void World::updateChunks(Camera& camera) {
-    float worldOffsetX = (WORLD_X_DIM * CHUNK_X_DIM) / 2.0f;
-    float worldOffsetZ = (WORLD_Z_DIM * CHUNK_Z_DIM) / 2.0f;
+void World::updateChunks(Camera& camera, bool& running) {
+    while (running) {
+        std::lock_guard<std::mutex> lock(chunkMutex);
+        float worldOffsetX = (WORLD_X_DIM * CHUNK_X_DIM) / 2.0f;
+        float worldOffsetZ = (WORLD_Z_DIM * CHUNK_Z_DIM) / 2.0f;
 
-    int newChunkX = (static_cast<int>(camera.Position.x + worldOffsetX) / CHUNK_X_DIM);
-    int newChunkZ = (static_cast<int>(camera.Position.z + worldOffsetZ) / CHUNK_Z_DIM);
+        int newChunkX = (static_cast<int>(camera.Position.x + worldOffsetX) / CHUNK_X_DIM);
+        int newChunkZ = (static_cast<int>(camera.Position.z + worldOffsetZ) / CHUNK_Z_DIM);
 
-    if (currentChunk.first != newChunkX || currentChunk.second != newChunkZ) {
-        currentChunk = {newChunkX, newChunkZ};
-        loadChunksAround(newChunkX, newChunkZ);
+        if (currentChunk.first != newChunkX || currentChunk.second != newChunkZ) {
+            currentChunk = {newChunkX, newChunkZ};
+            loadChunksAround(newChunkX, newChunkZ);
+        }
     }
 }
 
 void World::loadChunksAround(int centerX, int centerZ) {
-    // std::vector<std::thread> threads;
-    std::mutex chunkMutex;
+    // First, load new chunk data into the chunks map
+    for (int i = -dataLoadRadius; i <= dataLoadRadius; ++i) {
+        for (int j = -dataLoadRadius; j <= dataLoadRadius; ++j) {
+            int chunkX = centerX + i;
+            int chunkZ = centerZ + j;
 
-    std::unordered_map<std::pair<int, int>, std::vector<int>, pair_hash> newChunks;
+            // Skip if the chunk has already been loaded
+            if (chunks.find({chunkX, chunkZ}) != chunks.end()) continue;
+
+            // Populate chunk data and add it to the chunks map
+            auto blocks = chunkTemplate.populateChunk(chunkX, chunkZ);
+            chunks[{chunkX, chunkZ}] = blocks;
+
+            // Push chunk to queue for later mesh processing
+            chunkQueue.push({chunkX, chunkZ});
+        }
+    }
+
+    std::queue<std::pair<int, int>> queueCopy = chunkQueue;
+
+    // After all chunks have been loaded, generate their mesh data and push it to meshQueue
+    while (!queueCopy.empty()) {
+        std::pair<int, int> chunkPos = queueCopy.front();
+        queueCopy.pop();
+
+        // Retrieve the chunk data
+        auto blocks = chunks[chunkPos];
+
+        // Generate mesh data
+        auto meshData = chunkmaker.createMeshDataFromChunk(chunkPos.first, chunkPos.second, blocks, chunks);
+
+        // Push the generated mesh data to the meshQueue
+        meshQueue.push(meshData);
+    }
+}
+
+
+
+void World::processChunks(Camera& camera) {
+    std::lock_guard<std::mutex> lock(chunkMutex);
+
+    float worldOffsetX = (WORLD_X_DIM * CHUNK_X_DIM) / 2.0f;
+    float worldOffsetZ = (WORLD_Z_DIM * CHUNK_Z_DIM) / 2.0f;
+
+    int centerX = (static_cast<int>(camera.Position.x + worldOffsetX) / CHUNK_X_DIM);
+    int centerZ = (static_cast<int>(camera.Position.z + worldOffsetZ) / CHUNK_Z_DIM);
+    
+    // Remove chunks out of view
     std::vector<std::pair<int, int>> chunksToDelete;
 
     // Find chunks to delete (out of load radius)
@@ -58,42 +105,16 @@ void World::loadChunksAround(int centerX, int centerZ) {
         removeChunkFromWorld(pos.first, pos.second);
     }
 
-    const int meshLoadRadius = WORLD_X_DIM / 2;   // Chunks that are actually rendered.
-    const int dataBuffer = 1;       // Extra ring for neighbor occlusion.
-    const int dataLoadRadius = meshLoadRadius + dataBuffer;
+    // Process mesh data and add it to the world
+    while (!meshQueue.empty()) {
+        std::pair<std::vector<Vertex>, std::vector<GLuint>> meshData = meshQueue.front();
+        meshQueue.pop();
 
+        // Get the chunk position from chunkQueue
+        std::pair<int, int> chunkPos = chunkQueue.front();
+        chunkQueue.pop();
 
-    // Load new chunk data in a slightly larger buffer zone:
-    for (int i = -dataLoadRadius; i <= dataLoadRadius; ++i) {
-        for (int j = -dataLoadRadius; j <= dataLoadRadius; ++j) {
-            int chunkX = centerX + i;
-            int chunkZ = centerZ + j;
-            if (chunks.find({chunkX, chunkZ}) != chunks.end()) continue;
-            
-            auto blocks = chunkTemplate.populateChunk(chunkX, chunkZ);
-            {
-                std::lock_guard<std::mutex> lock(chunkMutex);
-                newChunks[{chunkX, chunkZ}] = blocks;
-            }
-        }
-    }
-
-    // Now add the loaded data to your main chunk map:
-    for (auto& [pos, blocks] : newChunks) {
-        chunks[pos] = blocks;
-    }
-
-    // Generate mesh only for chunks within the mesh load radius:
-    for (int i = -meshLoadRadius; i <= meshLoadRadius; ++i) {
-        for (int j = -meshLoadRadius; j <= meshLoadRadius; ++j) {
-            int chunkX = centerX + i;
-            int chunkZ = centerZ + j;
-            auto it = chunks.find({chunkX, chunkZ});
-            if (it == chunks.end()) continue;  // Should be loaded, but check to be safe.
-            
-            auto meshData = chunkmaker.createMeshDataFromChunk(chunkX, chunkZ, it->second, chunks);
-            addChunkMeshToWorld(chunkX, chunkZ, meshData.first, meshData.second);
-        }
+        addChunkMeshToWorld(chunkPos.first, chunkPos.second, meshData.first, meshData.second);
     }
 }
 
