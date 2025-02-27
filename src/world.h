@@ -46,6 +46,7 @@ struct World {
     std::vector<std::thread> threads;
     std::mutex chunkMutex;
     std::mutex chunkQueueMutex;
+    std::mutex meshQueueMutex;
 
     std::queue<std::pair<int, int>> chunkQueue;
     std::queue<std::pair<std::vector<Vertex>, std::vector<GLuint>>> meshQueue;

@@ -44,18 +44,21 @@ void World::loadChunksAround(int centerX, int centerZ) {
     // First, load new chunk data into the chunks map
     for (int i = -dataLoadRadius; i <= dataLoadRadius; ++i) {
         for (int j = -dataLoadRadius; j <= dataLoadRadius; ++j) {
-            int chunkX = centerX + i;
-            int chunkZ = centerZ + j;
+            {
+                std::lock_guard<std::mutex> lock(chunkQueueMutex);
+                int chunkX = centerX + i;
+                int chunkZ = centerZ + j;
 
-            // Skip if the chunk has already been loaded
-            if (chunks.find({chunkX, chunkZ}) != chunks.end()) continue;
+                // Skip if the chunk has already been loaded
+                if (chunks.find({chunkX, chunkZ}) != chunks.end()) continue;
 
-            // Populate chunk data and add it to the chunks map
-            auto blocks = chunkTemplate.populateChunk(chunkX, chunkZ);
-            chunks[{chunkX, chunkZ}] = blocks;
+                // Populate chunk data and add it to the chunks map
+                auto blocks = chunkTemplate.populateChunk(chunkX, chunkZ);
+                chunks[{chunkX, chunkZ}] = blocks;
 
-            // Push chunk to queue for later mesh processing
-            chunkQueue.push({chunkX, chunkZ});
+                // Push chunk to queue for later mesh processing
+                chunkQueue.push({chunkX, chunkZ});
+            }
         }
     }
 
@@ -80,14 +83,24 @@ void World::loadChunksAround(int centerX, int centerZ) {
 
 
 void World::processChunks(Camera& camera) {
-    std::lock_guard<std::mutex> lock(chunkMutex);
-
     float worldOffsetX = (WORLD_X_DIM * CHUNK_X_DIM) / 2.0f;
     float worldOffsetZ = (WORLD_Z_DIM * CHUNK_Z_DIM) / 2.0f;
 
     int centerX = (static_cast<int>(camera.Position.x + worldOffsetX) / CHUNK_X_DIM);
     int centerZ = (static_cast<int>(camera.Position.z + worldOffsetZ) / CHUNK_Z_DIM);
     
+    // Process mesh data and add it to the world
+    while (!meshQueue.empty()) {
+        std::pair<std::vector<Vertex>, std::vector<GLuint>> meshData = meshQueue.front();
+        meshQueue.pop();
+
+        // Get the chunk position from chunkQueue
+        std::pair<int, int> chunkPos = chunkQueue.front();
+        chunkQueue.pop();
+
+        addChunkMeshToWorld(chunkPos.first, chunkPos.second, meshData.first, meshData.second);
+    }
+
     // Remove chunks out of view
     std::vector<std::pair<int, int>> chunksToDelete;
 
@@ -105,17 +118,6 @@ void World::processChunks(Camera& camera) {
         removeChunkFromWorld(pos.first, pos.second);
     }
 
-    // Process mesh data and add it to the world
-    while (!meshQueue.empty()) {
-        std::pair<std::vector<Vertex>, std::vector<GLuint>> meshData = meshQueue.front();
-        meshQueue.pop();
-
-        // Get the chunk position from chunkQueue
-        std::pair<int, int> chunkPos = chunkQueue.front();
-        chunkQueue.pop();
-
-        addChunkMeshToWorld(chunkPos.first, chunkPos.second, meshData.first, meshData.second);
-    }
 }
 
 void World::removeChunkFromWorld(int xPos, int zPos) {

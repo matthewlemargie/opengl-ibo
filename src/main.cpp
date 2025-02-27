@@ -60,17 +60,13 @@ int main()
 
         wf.toggleWireframe();
         // skybox.Draw(&camera);
-        auto chunkProcessStart = std::chrono::high_resolution_clock::now();
         world.processChunks(camera);
-        auto chunkProcessEnd = std::chrono::high_resolution_clock::now();
         world.Render(camera);
         // Create a window and display variables
         ImGui::Begin("Variable Viewer");
         ImGui::Text("Camera position: %.3f, %.3f, %.3f", camera.Position.x, camera.Position.y, camera.Position.z);
         ImGui::Text("Camera orientation: %.3f, %.3f, %.3f", camera.Orientation.x, camera.Orientation.y, camera.Orientation.z);
         ImGui::Text("Framerate: %.3f", glContext.fpsCounter.FPS);
-        std::chrono::duration<double> processTime = chunkProcessEnd - chunkProcessStart;
-        ImGui::Text("Chunk Process Time: %.3f", processTime.count());
         ImGui::Checkbox("VSync", &vsync);
         ImGui::End();  // End the window
 
