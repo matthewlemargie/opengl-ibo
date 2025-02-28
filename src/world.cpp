@@ -41,35 +41,45 @@ void World::updateChunks(Camera& camera, bool& running) {
 }
 
 void World::loadChunksAround(int centerX, int centerZ) {
-    // First, load new chunk data into the chunks map
-    for (int i = -dataLoadRadius; i <= dataLoadRadius; ++i) {
-        for (int j = -dataLoadRadius; j <= dataLoadRadius; ++j) {
-            {
-                std::lock_guard<std::mutex> lock(chunkQueueMutex);
-                int chunkX = centerX + i;
-                int chunkZ = centerZ + j;
+    for (int i = -dataLoadRadius; i < dataLoadRadius; ++i) {
+        for (int j = -dataLoadRadius; j < dataLoadRadius; ++j) {
+            int chunkX = centerX + i;
+            int chunkZ = centerZ + j;
+            std::pair<int, int> chunkPos = {chunkX, chunkZ};
 
-                // Push chunk to queue for later mesh processing
-                chunkQueue.push({chunkX, chunkZ});
+            std::lock_guard<std::mutex> lock(chunkQueueMutex);
 
-                // Skip if the chunk has already been loaded
-                if (chunks.find({chunkX, chunkZ}) != chunks.end()) continue;
+            // Skip if the chunk's mesh already exists
+            // if (chunkVAOs.find(chunkPos) != chunkVAOs.end()) {
+                // continue;
+            // }
 
-                // Populate chunk data and add it to the chunks map
-                auto blocks = chunkTemplate.populateChunk(chunkX, chunkZ);
-                chunks[{chunkX, chunkZ}] = blocks;
+            // Push chunk to queue for later mesh processing
+            chunkQueue.push(chunkPos);
+
+            // Skip if the chunk data is already loaded
+            if (chunks.find(chunkPos) != chunks.end()) {
+                continue;
             }
+
+            // Populate chunk data and add it to the chunks map
+            auto blocks = chunkTemplate.populateChunk(chunkX, chunkZ);
+            chunks[chunkPos] = blocks;
         }
     }
 
     std::queue<std::pair<int, int>> queueCopy = chunkQueue;
 
-    // After all chunks have been loaded, generate their mesh data and push it to meshQueue
+    // Generate mesh data only for chunks that need a mesh
     while (!queueCopy.empty()) {
         std::pair<int, int> chunkPos = queueCopy.front();
         queueCopy.pop();
 
-        // Retrieve the chunk data
+        // Ensure the chunk data exists before generating the mesh
+        if (chunks.find(chunkPos) == chunks.end()) {
+            continue;
+        }
+
         auto blocks = chunks[chunkPos];
 
         // Generate mesh data
@@ -79,8 +89,6 @@ void World::loadChunksAround(int centerX, int centerZ) {
         meshQueue.push(meshData);
     }
 }
-
-
 
 void World::processChunks(Camera& camera) {
     float worldOffsetX = (WORLD_X_DIM * CHUNK_X_DIM) / 2.0f;
