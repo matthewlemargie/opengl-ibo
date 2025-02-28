@@ -49,15 +49,15 @@ void World::loadChunksAround(int centerX, int centerZ) {
                 int chunkX = centerX + i;
                 int chunkZ = centerZ + j;
 
+                // Push chunk to queue for later mesh processing
+                chunkQueue.push({chunkX, chunkZ});
+
                 // Skip if the chunk has already been loaded
                 if (chunks.find({chunkX, chunkZ}) != chunks.end()) continue;
 
                 // Populate chunk data and add it to the chunks map
                 auto blocks = chunkTemplate.populateChunk(chunkX, chunkZ);
                 chunks[{chunkX, chunkZ}] = blocks;
-
-                // Push chunk to queue for later mesh processing
-                chunkQueue.push({chunkX, chunkZ});
             }
         }
     }
@@ -131,7 +131,7 @@ void World::removeChunkFromWorld(int xPos, int zPos) {
         chunkVBOs.erase(pos);
         chunkEBOs.erase(pos);
         chunkIndexCounts.erase(pos);
-        chunks.erase(pos);
+        // chunks.erase(pos);
     }
 }
 
