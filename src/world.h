@@ -49,7 +49,7 @@ struct World {
     std::mutex meshQueueMutex;
 
     std::queue<std::pair<int, int>> chunkQueue;
-    std::queue<std::pair<std::vector<Vertex>, std::vector<GLuint>>> meshQueue;
+    std::queue<std::pair<std::pair<int, int>, std::pair<std::vector<Vertex>, std::vector<GLuint>>>> meshQueue;
 
     Chunk chunkTemplate;
     Shader* shader;

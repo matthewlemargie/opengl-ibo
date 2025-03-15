@@ -37,6 +37,7 @@ void World::updateChunks(Camera& camera, bool& running) {
             currentChunk = {newChunkX, newChunkZ};
             loadChunksAround(newChunkX, newChunkZ);
         }
+        std::this_thread::sleep_for(std::chrono::duration<double>(0.1));
     }
 }
 
@@ -47,15 +48,11 @@ void World::loadChunksAround(int centerX, int centerZ) {
             int chunkZ = centerZ + j;
             std::pair<int, int> chunkPos = {chunkX, chunkZ};
 
-            std::lock_guard<std::mutex> lock(chunkQueueMutex);
-
-            // Skip if the chunk's mesh already exists
-            // if (chunkVAOs.find(chunkPos) != chunkVAOs.end()) {
-                // continue;
-            // }
+            // std::lock_guard<std::mutex> lock(chunkQueueMutex);
 
             // Push chunk to queue for later mesh processing
-            chunkQueue.push(chunkPos);
+            if (i > -meshLoadRadius && i < meshLoadRadius && j > -meshLoadRadius && j < meshLoadRadius)
+                chunkQueue.push(chunkPos);
 
             // Skip if the chunk data is already loaded
             if (chunks.find(chunkPos) != chunks.end()) {
@@ -68,12 +65,11 @@ void World::loadChunksAround(int centerX, int centerZ) {
         }
     }
 
-    std::queue<std::pair<int, int>> queueCopy = chunkQueue;
-
     // Generate mesh data only for chunks that need a mesh
-    while (!queueCopy.empty()) {
-        std::pair<int, int> chunkPos = queueCopy.front();
-        queueCopy.pop();
+    while (!chunkQueue.empty()) {
+        std::pair<int, int> chunkPos = chunkQueue.front();
+        chunkQueue.pop();
+
 
         // Ensure the chunk data exists before generating the mesh
         if (chunks.find(chunkPos) == chunks.end()) {
@@ -86,7 +82,7 @@ void World::loadChunksAround(int centerX, int centerZ) {
         auto meshData = chunkmaker.createMeshDataFromChunk(chunkPos.first, chunkPos.second, blocks, chunks);
 
         // Push the generated mesh data to the meshQueue
-        meshQueue.push(meshData);
+        meshQueue.push({chunkPos, meshData});
     }
 }
 
@@ -99,12 +95,9 @@ void World::processChunks(Camera& camera) {
     
     // Process mesh data and add it to the world
     while (!meshQueue.empty()) {
-        std::pair<std::vector<Vertex>, std::vector<GLuint>> meshData = meshQueue.front();
+        std::pair<std::vector<Vertex>, std::vector<GLuint>> meshData = meshQueue.front().second;
+        std::pair<int, int> chunkPos = meshQueue.front().first;
         meshQueue.pop();
-
-        // Get the chunk position from chunkQueue
-        std::pair<int, int> chunkPos = chunkQueue.front();
-        chunkQueue.pop();
 
         addChunkMeshToWorld(chunkPos.first, chunkPos.second, meshData.first, meshData.second);
     }
@@ -139,7 +132,7 @@ void World::removeChunkFromWorld(int xPos, int zPos) {
         chunkVBOs.erase(pos);
         chunkEBOs.erase(pos);
         chunkIndexCounts.erase(pos);
-        // chunks.erase(pos);
+        chunks.erase(pos);
     }
 }
 
