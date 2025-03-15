@@ -26,7 +26,6 @@ World::~World() {
 
 void World::updateChunks(Camera& camera, bool& running) {
     while (running) {
-        std::lock_guard<std::mutex> lock(chunkMutex);
         float worldOffsetX = (WORLD_X_DIM * CHUNK_X_DIM) / 2.0f;
         float worldOffsetZ = (WORLD_Z_DIM * CHUNK_Z_DIM) / 2.0f;
 
@@ -35,15 +34,18 @@ void World::updateChunks(Camera& camera, bool& running) {
 
         if (currentChunk.first != newChunkX || currentChunk.second != newChunkZ) {
             currentChunk = {newChunkX, newChunkZ};
-            loadChunksAround(newChunkX, newChunkZ);
+            {
+                std::lock_guard<std::mutex> lock(chunkMutex);
+                loadChunksAround(newChunkX, newChunkZ);
+            }
         }
         std::this_thread::sleep_for(std::chrono::duration<double>(0.1));
     }
 }
 
 void World::loadChunksAround(int centerX, int centerZ) {
-    for (int i = -dataLoadRadius; i < dataLoadRadius; ++i) {
-        for (int j = -dataLoadRadius; j < dataLoadRadius; ++j) {
+    for (int i = -dataLoadRadius; i <= dataLoadRadius; ++i) {
+        for (int j = -dataLoadRadius; j <= dataLoadRadius; ++j) {
             int chunkX = centerX + i;
             int chunkZ = centerZ + j;
             std::pair<int, int> chunkPos = {chunkX, chunkZ};
@@ -51,8 +53,12 @@ void World::loadChunksAround(int centerX, int centerZ) {
             // std::lock_guard<std::mutex> lock(chunkQueueMutex);
 
             // Push chunk to queue for later mesh processing
-            if (i > -meshLoadRadius && i < meshLoadRadius && j > -meshLoadRadius && j < meshLoadRadius)
-                chunkQueue.push(chunkPos);
+            if (i > -meshLoadRadius && i < meshLoadRadius && j > -meshLoadRadius && j < meshLoadRadius) {
+                if (loadedChunkmeshes.find(chunkPos) == loadedChunkmeshes.end()) {
+                    chunkQueue.push(chunkPos);
+                    loadedChunkmeshes.insert(chunkPos);
+                }
+            }
 
             // Skip if the chunk data is already loaded
             if (chunks.find(chunkPos) != chunks.end()) {
@@ -109,7 +115,24 @@ void World::processChunks(Camera& camera) {
     for (auto& [pos, _] : chunks) {
         int xDist = abs(pos.first - centerX);
         int zDist = abs(pos.second - centerZ);
-        if (xDist > WORLD_X_DIM / 2 || zDist > WORLD_Z_DIM / 2) {
+        if (xDist > dataLoadRadius || zDist > dataLoadRadius) {
+            chunksToDelete.push_back(pos);
+        }
+    }
+
+    // Remove chunks that are too far from the player
+    for (auto& pos : chunksToDelete) {
+        removeChunkFromChunks(pos.first, pos.second);
+    }
+
+    chunksToDelete.clear();
+
+    // Find chunks to delete (out of load radius)
+    for (auto& [pos, _] : chunks) {
+        int xDist = abs(pos.first - centerX);
+        int zDist = abs(pos.second - centerZ);
+        if (xDist > meshLoadRadius || zDist > meshLoadRadius) {
+            loadedChunkmeshes.erase(pos);
             chunksToDelete.push_back(pos);
         }
     }
@@ -118,7 +141,6 @@ void World::processChunks(Camera& camera) {
     for (auto& pos : chunksToDelete) {
         removeChunkFromWorld(pos.first, pos.second);
     }
-
 }
 
 void World::removeChunkFromWorld(int xPos, int zPos) {
@@ -132,8 +154,12 @@ void World::removeChunkFromWorld(int xPos, int zPos) {
         chunkVBOs.erase(pos);
         chunkEBOs.erase(pos);
         chunkIndexCounts.erase(pos);
-        chunks.erase(pos);
     }
+}
+
+void World::removeChunkFromChunks(int xPos, int zPos) {
+    std::pair<int, int> pos = {xPos, zPos};
+    chunks.erase(pos);
 }
 
 void World::addChunkMeshToWorld(int xPos, int zPos, std::vector<Vertex> chunkVertices, std::vector<GLuint> chunkIndices) {
@@ -173,7 +199,7 @@ void World::textureActivate() {
 
 // In World::Render - Fix Chunk Position Offsets
 void World::Render(Camera& camera) {
-    // updateChunks(camera);
+    processChunks(camera);
 
     shader->Activate();
     camera.Inputs();

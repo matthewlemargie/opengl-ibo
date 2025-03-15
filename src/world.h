@@ -22,6 +22,7 @@
 #include "OpenGL/Camera.h"
 
 #include <map>
+#include <unordered_set>
 #include <utility>  // For std::pair
 #include <functional>  // For std::hash
 #include <thread>
@@ -37,11 +38,14 @@ struct World {
     void processChunks(Camera& camera);
     void loadChunksAround(int centerX, int centerZ);  // Loads chunks in a radius
     void removeChunkFromWorld(int xPos, int zPos);  // Removes old chunks
+    void removeChunkFromChunks(int xPos, int zPos);
     void addChunkMeshToWorld(int xPos, int zPos, std::vector<Vertex> chunkVertices, std::vector<GLuint> chunkIndices);
     
     void textureActivate();
     void Render(Camera& camera);
     std::unordered_map<std::pair<int, int>, std::vector<int>, pair_hash> chunks;
+
+    std::unordered_set<std::pair<int, int>, pair_hash> loadedChunkmeshes;
 
     std::vector<std::thread> threads;
     std::mutex chunkMutex;

@@ -60,7 +60,7 @@ int main()
 
         wf.toggleWireframe();
         // skybox.Draw(&camera);
-        world.processChunks(camera);
+        // world.processChunks(camera);
         world.Render(camera);
         // Create a window and display variables
         ImGui::Begin("Variable Viewer");

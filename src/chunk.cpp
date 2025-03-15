@@ -32,7 +32,7 @@ std::vector<int> Chunk::populateChunk(int chunkX, int chunkZ) {
             // Get noise value and scale to appropriate height range
             float value = noise.GetNoise(worldX, worldZ);
             float height = (value * 0.5f + 0.5f) * CHUNK_Y_DIM * amplitude;
-            height = 0.6f * CHUNK_Y_DIM + (0.4f) * (height);
+            height = 0.3f * CHUNK_Y_DIM + (0.7f) * (height);
 
             int roundHeight = static_cast<int>(std::ceil(height));
             roundHeight = std::max(1, roundHeight);  // Ensure at least one block is placed
